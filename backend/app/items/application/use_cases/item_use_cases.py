@@ -16,13 +16,7 @@ class GetItemUseCase:
         item = await self.repository.get_by_id(item_id)
         if item is None:
             return None
-        return ItemDTO(
-            id=item.id,
-            name=item.name,
-            description=item.description,
-            created_at=item.created_at,
-            updated_at=item.updated_at,
-        )
+        return ItemDTO.model_validate(item)
 
 
 class GetAllItemsUseCase:
@@ -34,16 +28,7 @@ class GetAllItemsUseCase:
     async def execute(self, skip: int = 0, limit: int = 100) -> List[ItemDTO]:
         """Get all items with pagination"""
         items = await self.repository.get_all(skip=skip, limit=limit)
-        return [
-            ItemDTO(
-                id=item.id,
-                name=item.name,
-                description=item.description,
-                created_at=item.created_at,
-                updated_at=item.updated_at,
-            )
-            for item in items
-        ]
+        return [ItemDTO.model_validate(item) for item in items]
 
 
 class CreateItemUseCase:
@@ -55,14 +40,8 @@ class CreateItemUseCase:
     async def execute(self, dto: ItemCreateDTO) -> ItemDTO:
         """Create a new item"""
         item = Item(name=dto.name, description=dto.description)
-        created_item = await self.repository.create(item)
-        return ItemDTO(
-            id=created_item.id,
-            name=created_item.name,
-            description=created_item.description,
-            created_at=created_item.created_at,
-            updated_at=created_item.updated_at,
-        )
+        created_item = await self.repository.create(item, tag_ids=dto.tag_ids)
+        return ItemDTO.model_validate(created_item)
 
 
 class UpdateItemUseCase:
@@ -84,14 +63,10 @@ class UpdateItemUseCase:
         if dto.description is not None:
             current_item.description = dto.description
 
-        updated_item = await self.repository.update(item_id, current_item)
-        return ItemDTO(
-            id=updated_item.id,
-            name=updated_item.name,
-            description=updated_item.description,
-            created_at=updated_item.created_at,
-            updated_at=updated_item.updated_at,
+        updated_item = await self.repository.update(
+            item_id, current_item, tag_ids=dto.tag_ids
         )
+        return ItemDTO.model_validate(updated_item)
 
 
 class DeleteItemUseCase:

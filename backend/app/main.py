@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine
 from app.items.infrastructure.api.item_router import router as items_router
+from app.tags.infrastructure.api.tag_router import router as tags_router
 
 # Import ORM models to register them with Base (avoid circular imports)
 from app.items.infrastructure.orm.item_orm import ItemORM  # noqa: F401
+from app.tags.infrastructure.orm.tag_orm import TagORM  # noqa: F401
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -28,6 +30,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(items_router)
+app.include_router(tags_router)
 
 
 @app.get("/")
