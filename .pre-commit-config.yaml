@@ -41,13 +41,6 @@ repos:
           - "eslint-plugin-react-hooks"
           - "eslint-plugin-react-refresh"
 
-  # Markdown linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.37.0
-    hooks:
-      - id: markdownlint
-        args: ["--fix"]
-
 ci:
   autofix_commit_msg: |
     refactor: auto-formatting with pre-commit hooks
