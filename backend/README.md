@@ -1,6 +1,8 @@
 # Backend - FastAPI with SQLAlchemy and SQLite
 
-This is the backend service built with FastAPI, SQLAlchemy, and SQLite following **Hexagonal Architecture** (Ports and Adapters pattern).
+This is the backend service built with FastAPI, SQLAlchemy, and
+SQLite following **Hexagonal Architecture** (Ports and Adapters
+pattern).
 
 ## Features
 
@@ -50,7 +52,7 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-2. Install dependencies:
+1. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -66,13 +68,14 @@ uvicorn app.main:app --reload
 
 The API will be available at:
 
-- API: http://localhost:8000
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- API: <http://localhost:8000>
+- Swagger UI: <http://localhost:8000/docs>
+- ReDoc: <http://localhost:8000/redoc>
 
 ### Database
 
-The SQLite database file (`app.db`) will be created automatically in the backend directory when you first run the application.
+The SQLite database file (`app.db`) will be created automatically
+in the backend directory when you first run the application.
 
 ## API Endpoints
 
@@ -94,7 +97,7 @@ The SQLite database file (`app.db`) will be created automatically in the backend
 
 ## Project Structure
 
-```
+```txt
 backend/
 ├── app/
 │   ├── __init__.py

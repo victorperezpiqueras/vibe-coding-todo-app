@@ -1,6 +1,5 @@
 ---
-applyTo:
-  - backend/**
+applyTo: "backend/**"
 ---
 
 # Backend Architecture Guidelines
@@ -13,7 +12,7 @@ This backend follows **Hexagonal Architecture** (Ports and Adapters pattern).
 
 Organize code into modules with a `shared` module for common functionality:
 
-```
+```txt
 backend/
 ├── app/
 │   ├── [module_name]/
@@ -36,14 +35,16 @@ backend/
 ### Layer Responsibilities
 
 #### Domain Layer (`domain/`)
+
 - **entities/**: Core business entities and domain models
 - **interfaces/**: Repository interfaces and domain service interfaces
-- **Rules**: 
+- **Rules**:
   - No dependencies on other layers
   - Pure business logic only
   - Framework-agnostic
 
 #### Application Layer (`application/`)
+
 - **use_cases/**: Application-specific business rules and orchestration
 - **dtos/**: Data Transfer Objects for input/output
 - **Rules**:
@@ -52,6 +53,7 @@ backend/
   - Defines interfaces that infrastructure implements
 
 #### Infrastructure Layer (`infrastructure/`)
+
 - **api/**: API endpoints, routers, request/response models (FastAPI)
 - **orm/**: ORM models and mappings (SQLAlchemy, etc.)
 - **database/**: Database connections, migrations, repositories
@@ -63,6 +65,7 @@ backend/
 ### Shared Module
 
 The `shared/` module contains reusable code across all modules:
+
 - Common domain entities
 - Shared use cases
 - Infrastructure utilities (database base classes, API utilities)
@@ -70,7 +73,8 @@ The `shared/` module contains reusable code across all modules:
 ### Dependency Rule
 
 Dependencies must flow inward:
-```
+
+```txt
 Infrastructure → Application → Domain
 ```
 
@@ -81,6 +85,7 @@ Infrastructure → Application → Domain
 ### Examples
 
 **Domain Entity:**
+
 ```python
 # app/users/domain/entities/user.py
 class User:
@@ -91,6 +96,7 @@ class User:
 ```
 
 **Domain Interface:**
+
 ```python
 # app/users/domain/interfaces/user_repository.py
 from abc import ABC, abstractmethod
@@ -103,6 +109,7 @@ class UserRepository(ABC):
 ```
 
 **Application Use Case:**
+
 ```python
 # app/users/application/use_cases/get_user.py
 from ...domain.interfaces.user_repository import UserRepository
@@ -111,13 +118,14 @@ from ..dtos.user_dto import UserDTO
 class GetUserUseCase:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
-    
+
     async def execute(self, user_id: str) -> UserDTO:
         user = await self.user_repository.get_by_id(user_id)
         return UserDTO.from_entity(user)
 ```
 
 **Infrastructure API:**
+
 ```python
 # app/users/infrastructure/api/user_router.py
 from fastapi import APIRouter, Depends
@@ -131,6 +139,7 @@ async def get_user(user_id: str, use_case: GetUserUseCase = Depends()):
 ```
 
 **Infrastructure Repository:**
+
 ```python
 # app/users/infrastructure/database/user_repository_impl.py
 from ...domain.interfaces.user_repository import UserRepository

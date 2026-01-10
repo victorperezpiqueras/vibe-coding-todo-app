@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+from typing import List, Optional
+
 from ..entities.item import Item
 
 

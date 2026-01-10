@@ -1,6 +1,7 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 
 from app.database import get_db
 from app.models import Item
@@ -41,11 +42,11 @@ def update_item(item_id: int, item: ItemUpdate, db: Session = Depends(get_db)):
     db_item = db.query(Item).filter(Item.id == item_id).first()
     if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    
+
     update_data = item.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_item, field, value)
-    
+
     db.commit()
     db.refresh(db_item)
     return db_item
@@ -57,7 +58,7 @@ def delete_item(item_id: int, db: Session = Depends(get_db)):
     db_item = db.query(Item).filter(Item.id == item_id).first()
     if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    
+
     db.delete(db_item)
     db.commit()
     return None

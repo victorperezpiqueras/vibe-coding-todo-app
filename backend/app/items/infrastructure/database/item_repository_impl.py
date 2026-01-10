@@ -1,5 +1,7 @@
-from typing import Optional, List
+from typing import List, Optional
+
 from sqlalchemy.orm import Session
+
 from ...domain.entities.item import Item
 from ...domain.interfaces.item_repository import ItemRepository
 from ..orm.item_orm import ItemORM

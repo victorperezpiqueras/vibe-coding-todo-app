@@ -46,7 +46,7 @@ function App() {
           description: 'Created from React frontend'
         })
       })
-      
+
       if (response.ok) {
         setNewItemName('')
         fetchItems()
@@ -79,7 +79,7 @@ function App() {
         </a>
       </div>
       <h1>Vite + React + FastAPI</h1>
-      
+
       <div className="card">
         <p>API Status: <strong>{apiStatus}</strong></p>
         <button onClick={() => setCount((count) => count + 1)}>
@@ -110,9 +110,9 @@ function App() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {items.map(item => (
-                <li key={item.id} style={{ 
-                  border: '1px solid #646cff', 
-                  padding: '0.5rem', 
+                <li key={item.id} style={{
+                  border: '1px solid #646cff',
+                  padding: '0.5rem',
                   marginBottom: '0.5rem',
                   borderRadius: '4px',
                   display: 'flex',

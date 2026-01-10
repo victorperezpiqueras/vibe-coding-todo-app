@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import engine, Base
+from app.database import Base, engine
 from app.items.infrastructure.api.item_router import router as items_router
 
 # Import ORM models to register them with Base (avoid circular imports)

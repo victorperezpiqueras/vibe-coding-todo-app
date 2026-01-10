@@ -1,0 +1,59 @@
+# Pre-commit hooks configuration
+# Install pre-commit: pip install pre-commit
+# Set up git hooks: pre-commit install
+# Run all checks: pre-commit run --all-files
+
+repos:
+  # Python linting and formatting with Ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.11
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+        files: ^backend/
+      - id: ruff-format
+        files: ^backend/
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  # JavaScript/TypeScript linting with ESLint
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.39.1
+    hooks:
+      - id: eslint
+        files: ^frontend/.*\.(js|jsx)$
+        types: [javascript]
+        additional_dependencies:
+          - "@eslint/js"
+          - "globals"
+          - "eslint-plugin-react-hooks"
+          - "eslint-plugin-react-refresh"
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.37.0
+    hooks:
+      - id: markdownlint
+        args: ["--fix"]
+
+ci:
+  autofix_commit_msg: |
+    refactor: auto-formatting with pre-commit hooks
+  autofix_prs: true
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "chore: update pre-commit hooks"
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

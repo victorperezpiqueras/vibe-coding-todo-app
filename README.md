@@ -4,7 +4,7 @@ A monorepo containing a React frontend and FastAPI backend with SQLite database.
 
 ## Project Structure
 
-```
+```txt
 vibe_coding_test1/
 ├── frontend/          # React + Vite frontend application
 │   ├── src/
@@ -26,11 +26,13 @@ vibe_coding_test1/
 ## Tech Stack
 
 ### Frontend
+
 - **React** - UI library
 - **Vite** - Build tool and dev server
 - **ESLint** - Code linting
 
 ### Backend
+
 - **FastAPI** - Modern Python web framework
 - **SQLAlchemy** - SQL toolkit and ORM
 - **SQLite** - Lightweight database
@@ -42,57 +44,67 @@ vibe_coding_test1/
 ### Frontend Setup
 
 1. Navigate to the frontend directory:
+
 ```bash
 cd frontend
 ```
 
-2. Install dependencies:
+1. Install dependencies:
+
 ```bash
 npm install
 ```
 
-3. Start the development server:
+1. Start the development server:
+
 ```bash
 npm run dev
 ```
 
-The frontend will be available at http://localhost:5173
+The frontend will be available at <http://localhost:5173>
 
 ### Backend Setup
 
 1. Navigate to the backend directory:
+
 ```bash
 cd backend
 ```
 
-2. Create a virtual environment:
+1. Create a virtual environment:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
+1. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Start the backend server:
+1. Start the backend server:
+
 ```bash
 uvicorn app.main:app --reload
 ```
 
 The backend will be available at:
-- API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
+
+- API: <http://localhost:8000>
+- API Documentation: <http://localhost:8000/docs>
 
 ## Features
 
-### Frontend
+### Frontend Features
+
 - Modern React application with Vite for fast development
 - Hot module replacement (HMR)
 - Ready for API integration
 
-### Backend
+### Backend Features
+
 - RESTful API with automatic documentation
 - CRUD operations for Items
 - SQLite database with SQLAlchemy ORM
@@ -106,6 +118,7 @@ The backend will be available at:
 For development, you'll need to run both the frontend and backend in separate terminals:
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd backend
 source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -113,6 +126,7 @@ uvicorn app.main:app --reload
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 cd frontend
 npm run dev
@@ -121,6 +135,7 @@ npm run dev
 ### Building for Production
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm run build

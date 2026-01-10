@@ -6,7 +6,7 @@ All commits in this repository must follow the Conventional Commits specificatio
 
 ### Format
 
-```
+```txt
 <type>[optional scope]: <description>
 
 [optional body]
@@ -19,7 +19,8 @@ All commits in this repository must follow the Conventional Commits specificatio
 - **feat**: A new feature
 - **fix**: A bug fix
 - **docs**: Documentation only changes
-- **style**: Code style changes (formatting, missing semi-colons, etc.) that don't affect code meaning
+- **style**: Code style changes (formatting, missing semi-colons, etc.)
+  that don't affect code meaning
 - **refactor**: Code change that neither fixes a bug nor adds a feature
 - **perf**: Performance improvements
 - **test**: Adding missing tests or correcting existing tests
@@ -30,6 +31,7 @@ All commits in this repository must follow the Conventional Commits specificatio
 ### Scope
 
 The scope should indicate the area of the codebase affected:
+
 - `backend`: Backend API changes
 - `frontend`: Frontend application changes
 - `db`: Database changes
@@ -37,7 +39,7 @@ The scope should indicate the area of the codebase affected:
 
 ### Examples
 
-```
+```txt
 feat(backend): add user authentication endpoint
 fix(frontend): resolve infinite loop in item list rendering
 docs: update API documentation with new endpoints
@@ -59,9 +61,10 @@ ci: add GitHub Actions workflow for automated testing
 
 ### Breaking Changes
 
-For breaking changes, add `!` after the type/scope or include `BREAKING CHANGE:` in the footer:
+For breaking changes, add `!` after the type/scope or include
+`BREAKING CHANGE:` in the footer:
 
-```
+```txt
 feat(api)!: change authentication response format
 
 BREAKING CHANGE: The authentication endpoint now returns a different token structure
