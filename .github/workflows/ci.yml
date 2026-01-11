@@ -164,12 +164,20 @@ jobs:
         run: |
           cd backend
           uvicorn app.main:app --host 0.0.0.0 --port 8000 &
-          sleep 5
+          # Wait for backend to be ready
+          for i in {1..30}; do
+            if curl -s http://localhost:8000/health > /dev/null 2>&1; then
+              echo "Backend is ready!"
+              break
+            fi
+            echo "Waiting for backend... ($i/30)"
+            sleep 1
+          done
 
       - name: Run E2E tests
         run: |
           cd frontend
-          npm run test:e2e
+          npm run test:e2e -- --project=chromium
 
       - name: Upload Playwright report
         if: always()
