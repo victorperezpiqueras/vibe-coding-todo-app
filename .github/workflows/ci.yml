@@ -8,6 +8,9 @@ on:
     branches:
       - '**'
 
+permissions:
+  contents: read
+
 jobs:
   backend-format:
     name: Backend - Format Check
