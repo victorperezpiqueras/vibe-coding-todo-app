@@ -168,14 +168,17 @@ test.describe('API Integration', () => {
     await page.getByTestId('toggle-tags-button').click()
     await page.getByTestId('create-new-tag-button').click()
     await page.getByTestId('new-tag-name-input').fill('Payload Tag')
+    
+    const tagCreationPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'POST'
+    )
     await page.getByTestId('create-tag-submit-button').click()
-    await page.waitForTimeout(500)
+    await tagCreationPromise
     
     // Select the tag
     const tagButton = page.locator('button').filter({ hasText: 'Payload Tag' }).first()
-    if (await tagButton.isVisible()) {
-      await tagButton.click()
-    }
+    await expect(tagButton).toBeVisible({ timeout: 5000 })
+    await tagButton.click()
     
     // Set up listener for item creation
     let requestBody = null
@@ -189,11 +192,14 @@ test.describe('API Integration', () => {
     await page.getByTestId('task-name-input').fill('Tagged Task')
     await page.getByTestId('task-description-input').fill('Has tags')
     
+    // Wait for item creation
+    const itemCreationPromise = page.waitForResponse(response => 
+      response.url().includes('/items/') && response.request().method() === 'POST'
+    )
+    
     // Create the task
     await page.getByTestId('create-task-button').click()
-    
-    // Wait for request to complete
-    await page.waitForTimeout(500)
+    await itemCreationPromise
     
     // Verify payload structure
     expect(requestBody).toBeTruthy()
@@ -213,9 +219,17 @@ test.describe('API Integration', () => {
       }
     })
     
+    // Set up listeners for sync requests to ensure completion
+    const itemsPromise = page.waitForResponse(response => 
+      response.url().includes('/items/') && response.request().method() === 'GET'
+    )
+    const tagsPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'GET'
+    )
+    
     // Perform some API operations
     await page.getByTestId('sync-button').click()
-    await page.waitForTimeout(1000)
+    await Promise.all([itemsPromise, tagsPromise])
     
     // Should not have CORS errors
     const corsErrors = errors.filter(err => err.toLowerCase().includes('cors'))

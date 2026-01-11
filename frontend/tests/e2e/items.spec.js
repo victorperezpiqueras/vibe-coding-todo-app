@@ -100,11 +100,19 @@ test.describe('Item Management', () => {
   })
 
   test('syncs data when sync button is clicked', async ({ page }) => {
+    // Set up listeners for sync requests
+    const itemsPromise = page.waitForResponse(response => 
+      response.url().includes('/items/') && response.request().method() === 'GET'
+    )
+    const tagsPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'GET'
+    )
+    
     // Click sync button
     await page.getByTestId('sync-button').click()
     
-    // Wait a bit for the sync to complete
-    await page.waitForTimeout(500)
+    // Wait for both sync requests to complete
+    await Promise.all([itemsPromise, tagsPromise])
     
     // Verify page is still functional
     await expect(page.getByTestId('add-task-button')).toBeVisible()

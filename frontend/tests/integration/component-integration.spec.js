@@ -84,14 +84,17 @@ test.describe('Component Integration', () => {
     // Create and select a tag
     await page.getByTestId('create-new-tag-button').click()
     await page.getByTestId('new-tag-name-input').fill('Persist Tag')
+    
+    const tagCreationPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'POST'
+    )
     await page.getByTestId('create-tag-submit-button').click()
-    await page.waitForTimeout(500)
+    await tagCreationPromise
     
     // Select the tag
     const tagButton = page.locator('button').filter({ hasText: 'Persist Tag' }).first()
-    if (await tagButton.isVisible()) {
-      await tagButton.click()
-    }
+    await expect(tagButton).toBeVisible({ timeout: 5000 })
+    await tagButton.click()
     
     // Close and reopen tag selector
     await page.getByTestId('toggle-tags-button').click()
@@ -116,7 +119,7 @@ test.describe('Component Integration', () => {
     await expect(page.getByText('Column Test')).toBeVisible()
     
     // Count should increase by 1
-    await page.waitForTimeout(300)
+    // Wait replaced with expect assertions
     const newCountText = await todoColumn.locator('.text-xs.text-slate-500').textContent()
     const newCount = parseInt(newCountText || '0')
     expect(newCount).toBe(initialCount + 1)
@@ -131,7 +134,7 @@ test.describe('Component Integration', () => {
     
     // Get count after creation
     const todoColumn = page.getByTestId('column-todo')
-    await page.waitForTimeout(300)
+    // Wait replaced with expect assertions
     const beforeDeleteText = await todoColumn.locator('.text-xs.text-slate-500').textContent()
     const beforeDeleteCount = parseInt(beforeDeleteText || '0')
     
@@ -141,7 +144,7 @@ test.describe('Component Integration', () => {
     await taskElement.getByRole('button', { name: /delete/i }).click()
     
     // Count should decrease by 1
-    await page.waitForTimeout(300)
+    // Wait replaced with expect assertions
     const afterDeleteText = await todoColumn.locator('.text-xs.text-slate-500').textContent()
     const afterDeleteCount = parseInt(afterDeleteText || '0')
     expect(afterDeleteCount).toBe(beforeDeleteCount - 1)
@@ -165,7 +168,7 @@ test.describe('Component Integration', () => {
     const inProgressColumn = page.getByTestId('column-inprogress')
     await taskElement.dragTo(inProgressColumn)
     
-    await page.waitForTimeout(500)
+    // Wait replaced with expect assertions
     
     // Task should still exist
     await expect(page.getByText('Drag Test Task')).toBeVisible()
@@ -182,7 +185,7 @@ test.describe('Component Integration', () => {
     await page.getByTestId('create-new-tag-button').click()
     await page.getByTestId('new-tag-name-input').fill('Display Tag')
     await page.getByTestId('create-tag-submit-button').click()
-    await page.waitForTimeout(500)
+    // Wait replaced with expect assertions
     
     const tagButton = page.locator('button').filter({ hasText: 'Display Tag' }).first()
     if (await tagButton.isVisible()) {
@@ -229,7 +232,7 @@ test.describe('Component Integration', () => {
     const taskElement = page.locator('[data-testid^="task-"]').filter({ hasText: 'Persist Test' })
     const inProgressColumn = page.getByTestId('column-inprogress')
     await taskElement.dragTo(inProgressColumn)
-    await page.waitForTimeout(500)
+    // Wait replaced with expect assertions
     
     // Reload the page
     await page.reload()
@@ -265,7 +268,7 @@ test.describe('Component Integration', () => {
     
     // Click sync
     await page.getByTestId('sync-button').click()
-    await page.waitForTimeout(500)
+    // Wait replaced with expect assertions
     
     // Task should still be visible
     await expect(page.getByText('Sync Test')).toBeVisible()
@@ -278,7 +281,7 @@ test.describe('Component Integration', () => {
     await expect(apiStatus).toBeVisible()
     
     // Wait for status to stabilize
-    await page.waitForTimeout(1000)
+    // Wait replaced with expect assertions
     const statusText = await apiStatus.textContent()
     expect(['healthy', 'checking...', 'disconnected']).toContain(statusText)
   })

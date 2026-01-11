@@ -17,17 +17,19 @@ test.describe('Tag Management', () => {
     // Create a new tag
     await page.getByTestId('create-new-tag-button').click()
     await page.getByTestId('new-tag-name-input').fill('E2E Tag')
-    await page.getByTestId('create-tag-submit-button').click()
     
-    // Wait for tag to be created and form to close
-    await page.waitForTimeout(500)
+    // Wait for tag creation response
+    const tagCreationPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'POST'
+    )
+    await page.getByTestId('create-tag-submit-button').click()
+    await tagCreationPromise
     
     // The tag should now be available for selection
     // Open tags again to select it
     const tagButton = page.locator('button').filter({ hasText: 'E2E Tag' }).first()
-    if (await tagButton.isVisible()) {
-      await tagButton.click()
-    }
+    await expect(tagButton).toBeVisible({ timeout: 5000 })
+    await tagButton.click()
     
     // Create the task
     await page.getByTestId('create-task-button').click()
@@ -62,22 +64,25 @@ test.describe('Tag Management', () => {
     // Create first tag
     await page.getByTestId('create-new-tag-button').click()
     await page.getByTestId('new-tag-name-input').fill('Tag1')
+    
+    const tagCreationPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'POST'
+    )
     await page.getByTestId('create-tag-submit-button').click()
-    await page.waitForTimeout(300)
+    await tagCreationPromise
     
     // Select the tag
     const tag1Button = page.locator('button').filter({ hasText: 'Tag1' }).first()
-    if (await tag1Button.isVisible()) {
-      await tag1Button.click()
-      
-      // Tag should appear in selected tags
-      await expect(page.locator('.inline-flex').filter({ hasText: 'Tag1' })).toBeVisible()
-      
-      // Click the remove button (×) to deselect
-      const removeButton = page.locator('button[aria-label*="Remove Tag1"]')
-      if (await removeButton.isVisible()) {
-        await removeButton.click()
-      }
+    await expect(tag1Button).toBeVisible({ timeout: 5000 })
+    await tag1Button.click()
+    
+    // Tag should appear in selected tags
+    await expect(page.locator('.inline-flex').filter({ hasText: 'Tag1' })).toBeVisible()
+    
+    // Click the remove button (×) to deselect
+    const removeButton = page.locator('button[aria-label*="Remove Tag1"]')
+    if (await removeButton.isVisible()) {
+      await removeButton.click()
     }
   })
 
@@ -122,9 +127,11 @@ test.describe('Tag Management', () => {
     await secondColor.click()
     
     // Create the tag
+    const tagCreationPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'POST'
+    )
     await page.getByTestId('create-tag-submit-button').click()
-    
-    await page.waitForTimeout(500)
+    await tagCreationPromise
     
     // Tag should be created (verification would require checking the color attribute)
     // For now, just verify the tag creation process completed
@@ -147,14 +154,17 @@ test.describe('Tag Management', () => {
     // Create a tag
     await page.getByTestId('create-new-tag-button').click()
     await page.getByTestId('new-tag-name-input').fill('Only Tag')
+    
+    const tagCreationPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'POST'
+    )
     await page.getByTestId('create-tag-submit-button').click()
-    await page.waitForTimeout(500)
+    await tagCreationPromise
     
     // Select the tag
     const tagButton = page.locator('button').filter({ hasText: 'Only Tag' }).first()
-    if (await tagButton.isVisible()) {
-      await tagButton.click()
-    }
+    await expect(tagButton).toBeVisible({ timeout: 5000 })
+    await tagButton.click()
     
     // Close and reopen tag selector
     await page.getByTestId('toggle-tags-button').click()

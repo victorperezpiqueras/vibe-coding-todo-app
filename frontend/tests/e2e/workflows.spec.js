@@ -16,14 +16,17 @@ test.describe('End-to-End Workflows', () => {
     await page.getByTestId('toggle-tags-button').click()
     await page.getByTestId('create-new-tag-button').click()
     await page.getByTestId('new-tag-name-input').fill('Lifecycle Tag')
+    
+    const tagCreationPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'POST'
+    )
     await page.getByTestId('create-tag-submit-button').click()
-    await page.waitForTimeout(500)
+    await tagCreationPromise
     
     // Select the newly created tag
     const tagButton = page.locator('button').filter({ hasText: 'Lifecycle Tag' }).first()
-    if (await tagButton.isVisible()) {
-      await tagButton.click()
-    }
+    await expect(tagButton).toBeVisible({ timeout: 5000 })
+    await tagButton.click()
     
     // Step 3: Create the task
     await page.getByTestId('create-task-button').click()
@@ -45,7 +48,6 @@ test.describe('End-to-End Workflows', () => {
 
   test('create multiple tasks with different tags', async ({ page }) => {
     // Create two different tags
-    const tags = ['Priority', 'Bug']
     const tasks = [
       { name: 'High Priority Feature', tag: 'Priority' },
       { name: 'Critical Bug Fix', tag: 'Bug' }
@@ -61,24 +63,27 @@ test.describe('End-to-End Workflows', () => {
       
       // Check if tag exists, otherwise create it
       const existingTag = page.locator('button').filter({ hasText: task.tag }).first()
-      const tagExists = await existingTag.isVisible()
+      const tagExists = await existingTag.isVisible({ timeout: 1000 }).catch(() => false)
       
       if (!tagExists) {
         await page.getByTestId('create-new-tag-button').click()
         await page.getByTestId('new-tag-name-input').fill(task.tag)
+        
+        const tagCreationPromise = page.waitForResponse(response => 
+          response.url().includes('/tags/') && response.request().method() === 'POST'
+        )
         await page.getByTestId('create-tag-submit-button').click()
-        await page.waitForTimeout(500)
+        await tagCreationPromise
       }
       
       // Select the tag
       const tagToSelect = page.locator('button').filter({ hasText: task.tag }).first()
-      if (await tagToSelect.isVisible()) {
-        await tagToSelect.click()
-      }
+      await expect(tagToSelect).toBeVisible({ timeout: 5000 })
+      await tagToSelect.click()
       
       // Create the task
       await page.getByTestId('create-task-button').click()
-      await page.waitForTimeout(300)
+      await expect(page.getByText(task.name)).toBeVisible()
     }
     
     // Verify all tasks are visible with their tags
@@ -97,9 +102,19 @@ test.describe('End-to-End Workflows', () => {
     // Verify task is visible
     await expect(page.getByText('Persistent Task')).toBeVisible()
     
+    // Set up listeners for sync requests
+    const itemsPromise = page.waitForResponse(response => 
+      response.url().includes('/items/') && response.request().method() === 'GET'
+    )
+    const tagsPromise = page.waitForResponse(response => 
+      response.url().includes('/tags/') && response.request().method() === 'GET'
+    )
+    
     // Click sync
     await page.getByTestId('sync-button').click()
-    await page.waitForTimeout(500)
+    
+    // Wait for sync to complete
+    await Promise.all([itemsPromise, tagsPromise])
     
     // Task should still be visible after sync
     await expect(page.getByText('Persistent Task')).toBeVisible()
@@ -121,9 +136,6 @@ test.describe('End-to-End Workflows', () => {
     
     // Perform drag and drop
     await taskElement.dragTo(inProgressColumn)
-    
-    // Wait a bit for the drop to complete
-    await page.waitForTimeout(500)
     
     // Verify the task still exists (it should now be in the In Progress column)
     await expect(page.getByText('Draggable Task')).toBeVisible()
@@ -172,7 +184,7 @@ test.describe('End-to-End Workflows', () => {
       await page.getByTestId('add-task-button').click()
       await page.getByTestId('task-name-input').fill(taskName)
       await page.getByTestId('create-task-button').click()
-      await page.waitForTimeout(200)
+      await expect(page.getByText(taskName)).toBeVisible()
     }
     
     // Verify all tasks are created
@@ -186,7 +198,7 @@ test.describe('End-to-End Workflows', () => {
       await taskElement.hover()
       const deleteButton = taskElement.getByRole('button', { name: /delete/i })
       await deleteButton.click()
-      await page.waitForTimeout(200)
+      await expect(page.getByText(taskName)).not.toBeVisible()
     }
     
     // Verify all tasks are deleted
