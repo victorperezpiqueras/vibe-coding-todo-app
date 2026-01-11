@@ -165,6 +165,11 @@ jobs:
           cd backend
           pip install -r requirements.txt
 
+      - name: Clean database for E2E tests
+        run: |
+          cd backend
+          rm -f app.db
+
       - name: Start backend server
         run: |
           cd backend
