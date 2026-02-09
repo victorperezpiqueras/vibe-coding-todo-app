@@ -109,48 +109,16 @@ The frontend will be available at <http://localhost:5173>
 
 ### Backend Setup
 
-#### Using Makefile (Recommended)
+For detailed backend setup instructions, see the [backend README](backend/README.md).
+
+#### Quick Start (Using Makefile)
 
 ```bash
 make install-backend  # Install dependencies
 make backend          # Start dev server
 ```
 
-#### Manual Setup
-
-1. Navigate to the backend directory:
-
-```bash
-cd backend
-```
-
-2. Create a virtual environment:
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
-
-**Using pip (recommended for production):**
-```bash
-pip install -r libraries/requirements.txt
-```
-
-**Using poetry (recommended for development):**
-```bash
-poetry install
-```
-
-4. Start the backend server:
-
-```bash
-uvicorn app.main:app --reload
-```
-
 The backend will be available at:
-
 - API: <http://localhost:8000>
 - API Documentation: <http://localhost:8000/docs>
 

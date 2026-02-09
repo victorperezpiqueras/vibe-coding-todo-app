@@ -6,7 +6,7 @@
 repos:
   # Python linting and formatting with Ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.11
+    rev: v0.15.0
     hooks:
       - id: ruff
         args: ["--fix"]
