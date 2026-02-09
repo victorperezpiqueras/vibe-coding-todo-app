@@ -86,9 +86,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: |
-          cd frontend
-          npm ci
+        run: make install-frontend-ci
 
       - name: Lint with ESLint
         run: make lint-frontend
