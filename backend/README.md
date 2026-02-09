@@ -40,7 +40,7 @@ For detailed architecture guidelines, see [.github/backend-architecture.instruct
 
 ### Prerequisites
 
-- Python 3.13 or higher
+- Python 3.13 (required, not compatible with older versions)
 - Poetry (install with: `pip install poetry`)
 - Make (optional, for using Makefile commands)
 

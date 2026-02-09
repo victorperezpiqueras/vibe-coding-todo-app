@@ -44,13 +44,23 @@ repos:
           - "eslint-plugin-react-hooks@7.0.1"
           - "eslint-plugin-react-refresh@0.4.24"
 
-      # Poetry requirements generation
-      - id: poetry-export
-        name: poetry-export (backend)
-        language: system
-        entry: bash -c 'cd backend && poetry export -f requirements.txt --output libraries/requirements.txt --without-hashes --without dev && poetry export -f requirements.txt --output libraries/requirements-dev.txt --without-hashes --with dev'
+  # Poetry dependency management
+  - repo: https://github.com/python-poetry/poetry
+    rev: 2.3.2
+    hooks:
+      - id: poetry-check
         files: ^backend/pyproject\.toml$
-        pass_filenames: false
+      - id: poetry-lock
+        files: ^backend/pyproject\.toml$
+        args: ["--directory=backend"]
+      - id: poetry-export
+        name: poetry-export (requirements.txt)
+        files: ^backend/(poetry\.lock|pyproject\.toml)$
+        args: ["--directory=backend", "-f", "requirements.txt", "-o", "backend/libraries/requirements.txt", "--without-hashes", "--without", "dev"]
+      - id: poetry-export
+        name: poetry-export (requirements-dev.txt)
+        files: ^backend/(poetry\.lock|pyproject\.toml)$
+        args: ["--directory=backend", "-f", "requirements.txt", "-o", "backend/libraries/requirements-dev.txt", "--without-hashes", "--with", "dev"]
 
 ci:
   autofix_commit_msg: |
