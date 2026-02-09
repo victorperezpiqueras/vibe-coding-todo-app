@@ -40,7 +40,7 @@ For detailed architecture guidelines, see [.github/backend-architecture.instruct
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.13 or higher
 - pip
 - Make (optional, for using Makefile commands)
 

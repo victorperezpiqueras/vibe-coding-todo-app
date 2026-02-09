@@ -46,7 +46,7 @@ vibe_coding_test1/
 ### Prerequisites
 
 - Node.js 20 or higher (for frontend)
-- Python 3.11 or higher (for backend)
+- Python 3.13 or higher (for backend)
 - Make (for running Makefile commands)
 
 ### Quick Start
