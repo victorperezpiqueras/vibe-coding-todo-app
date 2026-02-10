@@ -84,7 +84,7 @@ files = [
 
 [[package]]
 name = "fastapi"
-version = "0.115.5"
+version = "0.128.7"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.8"
@@ -713,7 +713,7 @@ sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
 name = "starlette"
-version = "0.41.3"
+version = "0.52.1"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.8"
