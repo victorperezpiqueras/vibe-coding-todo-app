@@ -38,12 +38,15 @@ test.describe('Basic Task Creation', () => {
     // Click the create tag submit button
     await page.getByTestId('create-tag-submit-button').click()
 
-    // Wait for the tag to be created and the form to close
-    await page.waitForTimeout(500)
+    // Wait for the tag creation form to close (toggle-tags-button should be visible)
+    await expect(page.getByTestId('toggle-tags-button')).toBeVisible()
 
-    // The tag should now appear in the unselected tags list
+    // The tag should now appear in the unselected tags list - wait for it to be visible
+    const tagButton = page.locator('button', { hasText: 'E2E Test' }).first()
+    await expect(tagButton).toBeVisible()
+    
     // Click on the tag to select it
-    await page.getByText('E2E Test').click()
+    await tagButton.click()
 
     // Submit the task creation form
     await page.getByTestId('create-task-button').click()
