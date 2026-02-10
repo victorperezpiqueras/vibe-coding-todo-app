@@ -8,6 +8,9 @@ packages = [{include = "app"}]
 requires-python = ">=3.13,<4.0.0"
 dynamic = ["dependencies"]
 
+[tool.poetry]
+package-mode = false
+
 [tool.poetry.dependencies]
 python = ">=3.13,<4.0.0"
 fastapi = "0.115.5"
@@ -18,9 +21,9 @@ pydantic = "2.10.3"
 pydantic-settings = "2.6.1"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "3.6.2"
-ruff = "0.1.11"
-pytest = "^8.0.0"
+pre-commit = "4.5.1"
+ruff = "0.15.0"
+pytest = "9.0.2"
 
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"

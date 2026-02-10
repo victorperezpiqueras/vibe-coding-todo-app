@@ -29,8 +29,8 @@ jobs:
         run: |
           pip install ruff==0.1.11
 
-      - name: Check formatting with ruff
-        run: make format-backend-check
+      - name: Format backend
+        run: make format-backend
 
   backend-lint:
     name: Backend - Lint
@@ -49,8 +49,8 @@ jobs:
         run: |
           pip install ruff==0.1.11
 
-      - name: Lint with ruff
-        run: make lint-backend-ruff
+      - name: Lint backend
+        run: make lint-backend
 
   backend-test:
     name: Backend - Tests
