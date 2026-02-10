@@ -30,6 +30,11 @@ install-frontend: ## Install frontend dependencies
 	cd frontend && npm install
 	@echo "$(GREEN)Frontend dependencies installed$(NC)"
 
+install-frontend-ci: ## Install frontend dependencies in CI mode (using npm ci)
+	@echo "$(YELLOW)Installing frontend dependencies in CI mode...$(NC)"
+	cd frontend && npm ci
+	@echo "$(GREEN)Frontend dependencies installed in CI mode$(NC)"
+
 precommit-install: ## Install pre-commit hooks
 	@echo "$(YELLOW)Installing pre-commit hooks...$(NC)"
 	pre-commit install
