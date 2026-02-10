@@ -44,7 +44,7 @@ test.describe('Basic Task Creation', () => {
     // The tag should now appear in the unselected tags list - wait for it to be visible
     const tagButton = page.locator('button', { hasText: 'E2E Test' }).first()
     await expect(tagButton).toBeVisible()
-    
+
     // Click on the tag to select it
     await tagButton.click()
 
