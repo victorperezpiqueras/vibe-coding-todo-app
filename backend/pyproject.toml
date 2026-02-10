@@ -1,13 +1,15 @@
-[tool.poetry]
+[project]
 name = "vibe-coding-test-backend"
 version = "1.0.0"
 description = "FastAPI backend with SQLAlchemy and SQLite"
-authors = ["Vibe Coding Team"]
+authors = [{name = "victorperezpiqueras", email = "victorperezpiqueras@gmail.com"}]
 readme = "README.md"
 packages = [{include = "app"}]
+requires-python = ">=3.13,<4.0.0"
+dynamic = ["dependencies"]
 
 [tool.poetry.dependencies]
-python = ">=3.13,<3.14"
+python = ">=3.13,<4.0.0"
 fastapi = "0.115.5"
 uvicorn = {extras = ["standard"], version = "0.34.0"}
 sqlalchemy = "2.0.36"
@@ -19,6 +21,9 @@ pydantic-settings = "2.6.1"
 pre-commit = "3.6.2"
 ruff = "0.1.11"
 pytest = "^8.0.0"
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
 
 [build-system]
 requires = ["poetry-core"]

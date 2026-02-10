@@ -40,7 +40,7 @@ For detailed architecture guidelines, see [.github/backend-architecture.instruct
 
 ### Prerequisites
 
-- Python 3.13 (required, not compatible with older versions)
+- Python 3.13
 - Poetry (install with: `pip install poetry`)
 - Make (optional, for using Makefile commands)
 
@@ -67,19 +67,16 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 2. Install dependencies:
 
-**Using pip (recommended for production):**
-```bash
-pip install -r libraries/requirements.txt
-```
+**Using poetry:**
 
-**Using poetry (recommended for development):**
 ```bash
 poetry install
 ```
 
-**For development with pip:**
+Install the poetry export plugin:
+
 ```bash
-pip install -r libraries/requirements-dev.txt
+poetry self add poetry-plugin-export
 ```
 
 ### Running the Server

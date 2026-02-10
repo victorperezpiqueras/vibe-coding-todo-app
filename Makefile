@@ -14,38 +14,12 @@ install: install-backend install-frontend precommit-install ## Install all depen
 
 install-backend: ## Install backend dependencies
 	@echo "$(YELLOW)Installing backend dependencies...$(NC)"
-	cd backend && pip install -r libraries/requirements.txt
+	cd backend && poetry install && poetry self add poetry-plugin-export
 	@echo "$(GREEN)Backend dependencies installed$(NC)"
-
-install-backend-dev: ## Install backend dependencies including dev dependencies
-	@echo "$(YELLOW)Installing backend dev dependencies...$(NC)"
-	cd backend && pip install -r libraries/requirements-dev.txt
-	@echo "$(GREEN)Backend dev dependencies installed$(NC)"
-
-install-backend-poetry: ## Install backend dependencies using poetry
-	@echo "$(YELLOW)Installing backend dependencies with poetry...$(NC)"
-	cd backend && poetry install
-	@echo "$(GREEN)Backend dependencies installed with poetry$(NC)"
-
-poetry-lock: ## Update poetry.lock file
-	@echo "$(YELLOW)Updating poetry.lock...$(NC)"
-	cd backend && poetry lock
-	@echo "$(GREEN)Poetry lock file updated$(NC)"
-
-poetry-export: ## Export poetry dependencies to requirements files
-	@echo "$(YELLOW)Exporting poetry dependencies...$(NC)"
-	cd backend && poetry export -f requirements.txt --output libraries/requirements.txt --without-hashes --without dev
-	cd backend && poetry export -f requirements.txt --output libraries/requirements-dev.txt --without-hashes --with dev
-	@echo "$(GREEN)Requirements files generated$(NC)"
 
 install-frontend: ## Install frontend dependencies
 	@echo "$(YELLOW)Installing frontend dependencies...$(NC)"
 	cd frontend && npm install
-	@echo "$(GREEN)Frontend dependencies installed$(NC)"
-
-install-frontend-ci: ## Install frontend dependencies for CI (uses npm ci)
-	@echo "$(YELLOW)Installing frontend dependencies (CI mode)...$(NC)"
-	cd frontend && npm ci
 	@echo "$(GREEN)Frontend dependencies installed$(NC)"
 
 precommit-install: ## Install pre-commit hooks
@@ -77,10 +51,6 @@ lint-backend: ## Lint backend code
 	@echo "$(YELLOW)Linting backend code...$(NC)"
 	cd backend && pylint app/ --disable=all --enable=E,F || true
 
-lint-backend-ruff: ## Lint backend code with ruff
-	@echo "$(YELLOW)Linting backend code with ruff...$(NC)"
-	cd backend && ruff check app/
-
 lint-frontend: ## Lint frontend code
 	@echo "$(YELLOW)Linting frontend code...$(NC)"
 	cd frontend && npm run lint
@@ -92,10 +62,6 @@ format: ## Format code in frontend and backend
 format-backend: ## Format backend code with black
 	@echo "$(YELLOW)Formatting backend code...$(NC)"
 	cd backend && black app/ || true
-
-format-backend-check: ## Check backend code formatting with ruff
-	@echo "$(YELLOW)Checking backend code formatting with ruff...$(NC)"
-	cd backend && ruff format --check app/
 
 format-frontend: ## Format frontend code with prettier
 	@echo "$(YELLOW)Formatting frontend code...$(NC)"
@@ -112,22 +78,6 @@ test-backend: ## Run backend tests
 test-frontend: ## Run frontend tests
 	@echo "$(YELLOW)Running frontend tests...$(NC)"
 	cd frontend && npm run test || true
-
-test-e2e: ## Run E2E tests with Playwright
-	@echo "$(YELLOW)Running E2E tests...$(NC)"
-	cd frontend && npm run test:e2e
-
-test-e2e-ui: ## Run E2E tests in UI mode
-	@echo "$(YELLOW)Running E2E tests in UI mode...$(NC)"
-	cd frontend && npm run test:e2e:ui
-
-test-e2e-debug: ## Run E2E tests in debug mode
-	@echo "$(YELLOW)Running E2E tests in debug mode...$(NC)"
-	cd frontend && npm run test:e2e:debug
-
-test-e2e-ci: ## Run E2E tests in CI mode (chromium only)
-	@echo "$(YELLOW)Running E2E tests in CI mode...$(NC)"
-	cd frontend && npm run test:e2e -- --project=chromium
 
 precommit-run: ## Run pre-commit checks on all files
 	@echo "$(YELLOW)Running pre-commit checks...$(NC)"
