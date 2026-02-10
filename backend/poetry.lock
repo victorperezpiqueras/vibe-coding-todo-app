@@ -719,8 +719,8 @@ optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "starlette-0.41.3-py3-none-any.whl", hash = "sha256:44cedb2b7c77a9de33a8b74b2b90e9f50d11fcf25d8270ea525ad71a25374ff7"},
-    {file = "starlette-0.41.3.tar.gz", hash = "sha256:0e4ab3d16522a255be6b28260b938eae2482f98ce5cc934cb08dce8dc3ba5835"},
+    {file = "starlette-0.52.1-py3-none-any.whl", hash = "sha256:12a9a6e1e1cad4f9b0fe5e8c4e29bbebcd90f85374768cc279f7b3639df5ae6"},
+    {file = "starlette-0.52.1.tar.gz", hash = "sha256:35d8d2c91df8a2d0ab3bde90dfd68afe8c1b8e8b5815bfc62a49ac14e50e2e4e"},
 ]
 
 [package.dependencies]
