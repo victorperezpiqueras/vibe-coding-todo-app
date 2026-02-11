@@ -1,27 +1,93 @@
-# React + Vite
+# Frontend - React + Vite
 
-This template provides a minimal setup to get React working in Vite
-with HMR and some ESLint rules.
+Modern React application built with Vite for fast development and optimized production builds.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react)
-  uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when
-  used in [rolldown-vite](https://vite.dev/guide/rolldown)) for
-  Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc)
-  uses [SWC](https://swc.rs/) for Fast Refresh
+- **React** - UI library for building user interfaces
+- **Vite** - Fast build tool with instant HMR
+- **ESLint** - Code linting for consistent code quality
+- **Vitest** - Unit testing framework
+- **Playwright** - End-to-end testing
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its
-impact on dev & build performances. To add it, see
-[this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js 20 or higher
+- Make (optional, for using Makefile commands)
 
-If you are developing a production application, we recommend using
-TypeScript with type-aware lint rules enabled. Check out the
-[TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts)
-for information on how to integrate TypeScript and
-[`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Installation
+
+From the project root directory:
+
+```bash
+make install-frontend
+```
+
+### Running the Development Server
+
+From the project root directory:
+
+```bash
+make frontend
+```
+
+The frontend will be available at <http://localhost:5173>
+
+For manual setup without Make, see the commands in the [Makefile](../Makefile).
+
+## Development
+
+### Linting
+
+```bash
+make lint-frontend     # Lint frontend code
+```
+
+### Formatting
+
+```bash
+make format-frontend   # Format frontend code with prettier
+```
+
+### Testing
+
+```bash
+make test-frontend     # Run unit tests
+make test-e2e-ci       # Run E2E tests (requires backend running)
+```
+
+For more granular test runs, use npm scripts directly from the frontend directory:
+
+```bash
+cd frontend
+npm run test           # Run unit tests
+npm run test:e2e       # Run E2E tests
+```
+
+### Building for Production
+
+```bash
+make build-frontend    # Build frontend for production
+```
+
+The production build will be available in the `frontend/dist` directory.
+
+## Project Structure
+
+```txt
+frontend/
+├── src/
+│   ├── components/    # React components
+│   ├── App.jsx        # Main application component
+│   └── main.jsx       # Application entry point
+├── public/            # Static assets
+├── e2e/               # End-to-end tests
+├── package.json       # Dependencies and scripts
+└── vite.config.js     # Vite configuration
+```
+
+## API Integration
+
+The frontend is configured to communicate with the backend API running on <http://localhost:8000>. CORS is enabled on the backend to allow requests from the frontend development server.

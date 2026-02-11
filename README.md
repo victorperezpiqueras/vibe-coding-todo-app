@@ -118,7 +118,7 @@ make check             # Run all checks (lint + pre-commit)
 
 - [Backend README](backend/README.md) - Architecture, API endpoints, and detailed backend documentation
 - [Frontend README](frontend/README.md) - Frontend setup and configuration
-- [Backend Architecture Guide](backend-architecture.instructions.md) - Hexagonal architecture guidelines
+- [Backend Architecture Guide](.github/backend-architecture.instructions.md) - Hexagonal architecture guidelines
 
 ## Contributing
 
