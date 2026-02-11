@@ -139,25 +139,28 @@ Or using pytest directly:
 
 ```bash
 cd backend
-pytest                    # Run all tests with coverage (configured in pyproject.toml)
-pytest tests/items/       # Run only items tests
-pytest tests/tags/        # Run only tags tests
-pytest -v                 # Verbose output
-pytest -k "test_create"   # Run tests matching pattern
+pytest                          # Run all tests (without coverage)
+pytest --cov=app                # Run tests with coverage
+pytest tests/items/             # Run only items tests
+pytest tests/tags/              # Run only tags tests
+pytest -v                       # Verbose output
+pytest -k "test_create"         # Run tests matching pattern
 ```
 
 #### Test Coverage
 
-The project uses `pytest-cov` to track test coverage. Coverage is automatically measured when running tests and generates:
+The project uses `pytest-cov` to track test coverage. Coverage is measured when running the `make test-backend-coverage` command or by using pytest with the `--cov` flag.
+
+Coverage reports generate:
 - Terminal output showing coverage percentage and missing lines
 - HTML report in `backend/htmlcov/` directory
 - XML report for CI/CD integration
 
-To view the HTML coverage report after running tests:
+To view the HTML coverage report after running tests with coverage:
 ```bash
 cd backend
 # Run tests to generate coverage report
-pytest
+make test-backend-coverage
 # Open the HTML report
 open htmlcov/index.html  # macOS
 xdg-open htmlcov/index.html  # Linux
