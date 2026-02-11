@@ -2,10 +2,10 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Basic Task Creation', () => {
   test('create one task with one label in one column', async ({ page }) => {
-    // Use unique names to avoid conflicts with previous test runs
-    const uniqueId = Date.now()
-    const uniqueTaskName = `Test-Task-${uniqueId}`
-    const uniqueTagName = `E2E-Tag-${uniqueId}`
+    // Use unique names based on timestamp to avoid conflicts with previous test runs
+    const timestamp = Date.now()
+    const uniqueTaskName = `Test-Task-${timestamp}`
+    const uniqueTagName = `E2E-Tag-${timestamp}`
     
     // Navigate to the application
     await page.goto('/')
@@ -64,8 +64,9 @@ test.describe('Basic Task Creation', () => {
     // Verify the task description is visible
     await expect(todoColumn.getByText('This is a test task created by e2e test').first()).toBeVisible()
 
-    // Verify the column counter shows at least 1 item (could be more if test ran multiple times)
+    // Verify the column counter shows at least 1 item
+    // (could be more if test ran multiple times without database cleanup)
     const columnHeader = todoColumn.locator('div').filter({ hasText: 'To Do' }).first()
-    await expect(columnHeader).toContainText(/[1-9]\d*/) // At least 1
+    await expect(columnHeader).toContainText(/[1-9]\d*/)
   })
 })
