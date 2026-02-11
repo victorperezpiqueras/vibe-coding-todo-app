@@ -193,7 +193,7 @@ tests/
             └── test_tag_router.py
 ```
 
-#### Test Organization
+#### Test Types
 
 - **Use Case Tests**: Mock repositories to test business logic in isolation
 - **API Tests**: Mock use cases to test HTTP endpoints and status codes
