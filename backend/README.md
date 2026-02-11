@@ -190,10 +190,11 @@ tests/
             └── test_tag_router.py
 ```
 
-#### Test Statistics
+#### Test Organization
 
 - **Use Case Tests**: Mock repositories to test business logic in isolation
 - **API Tests**: Mock use cases to test HTTP endpoints and status codes
+- **Integration Tests**: Test repository implementations with real database
 - **Total**: 45 tests covering all CRUD operations for Items and Tags
 
 
