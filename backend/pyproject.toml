@@ -90,4 +90,5 @@ show_missing = true
 skip_covered = false
 
 [tool.coverage.html]
+# Output directory for HTML coverage reports
 directory = "htmlcov"
