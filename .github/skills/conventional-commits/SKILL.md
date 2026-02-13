@@ -119,8 +119,11 @@ fix(ui): fix the bug in dashboard component on line 45
 5. **(if commit failed due to precommit hook)**
 
    ```bash
+   # Re-stage files modified by the pre-commit hook
    git add <changed-files>
-   git commit ...
+   # Re-run the same commit as in step 4 with the original message
+   git commit -m "type(scope): description"
+   # or re-run the multi-line commit command used above
    ```
 
 ---
@@ -173,6 +176,8 @@ git commit --amend --no-edit
 # Amend with new message
 git commit --amend -m "new message"
 
-# if precommit is not setup, run checks:
+# Run pre-commit checks on modified files (requires pre-commit to be installed):
 make precommit-run-modified
+# To install the git pre-commit hook so checks run automatically on commit:
+# make precommit-install
 ```

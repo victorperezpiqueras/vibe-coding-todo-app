@@ -1,5 +1,5 @@
 ---
-name: issue-creation-definition
+name: create-github-issue
 description: >
   Enforces the use of the repository's official Markdown issue template
   when creating or updating GitHub issues.
@@ -10,7 +10,6 @@ metadata:
   auto_invoke:
     - "Creating a GitHub issue"
     - "Updating issue description"
-    - "Filing a bug report"
     - "Submitting a feature request"
 ---
 
