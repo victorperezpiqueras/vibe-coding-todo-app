@@ -1,6 +1,6 @@
 ## Project structure
 
-- `backend/`: Contains the FastAPI backend application, organized using Hexagonal Architecture principles. Find the docs here: [backend/README.md](/backend/README.md) and architecture guidelines here: [backend-architecture.instructions.md](/.github/backend-architecture.instructions.md).
+- `backend/`: Contains the FastAPI backend application, organized using Hexagonal Architecture principles. Find the docs here: [backend/README.md](/backend/README.md).
 - `frontend/`: Contains the React frontend application, organized using a feature-based structure. Find the docs here: [frontend/README.md](/frontend/README.md).
 - `.github/`: Contains GitHub-specific configuration files, including workflows and instructions.
 

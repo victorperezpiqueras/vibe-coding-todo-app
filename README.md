@@ -1,24 +1,23 @@
 # Vibe Coding Test - Monorepo
 
 [![CI](https://github.com/victorperezpiqueras/vibe_coding_test1/actions/workflows/ci.yml/badge.svg)](https://github.com/victorperezpiqueras/vibe_coding_test1/actions/workflows/ci.yml)
-[![Backend Coverage](https://img.shields.io/codecov/c/github/victorperezpiqueras/vibe_coding_test1?flag=backend&style=flat&logo=python&logoColor=yellow&label=backend-cov
-)](https://codecov.io/gh/victorperezpiqueras/vibe_coding_test1?flag=backend)
-[![Frontend Coverage](https://img.shields.io/codecov/c/github/victorperezpiqueras/vibe_coding_test1?flag=frontend&style=flat&logo=react&logoColor=lightblue&label=frontend-cov
-)](https://codecov.io/gh/victorperezpiqueras/vibe_coding_test1?flag=frontend)
+[![Backend Coverage](https://img.shields.io/codecov/c/github/victorperezpiqueras/vibe_coding_test1?flag=backend&style=flat&logo=python&logoColor=yellow&label=backend-cov)](https://codecov.io/gh/victorperezpiqueras/vibe_coding_test1?flag=backend)
+[![Frontend Coverage](https://img.shields.io/codecov/c/github/victorperezpiqueras/vibe_coding_test1?flag=frontend&style=flat&logo=react&logoColor=lightblue&label=frontend-cov)](https://codecov.io/gh/victorperezpiqueras/vibe_coding_test1?flag=frontend)
 
 A full-stack application with React frontend and FastAPI backend, using SQLite database and following Hexagonal Architecture principles.
 
 ## Overview
 
 This monorepo contains:
+
 - **Frontend**: React + Vite application with modern development tools
 - **Backend**: FastAPI service with SQLAlchemy ORM, following Hexagonal Architecture
 - **Database**: SQLite for lightweight data persistence
 
 ## Tech Stack
 
-**Frontend**: React, Vite, ESLint  
-**Backend**: FastAPI, SQLAlchemy, SQLite, Uvicorn, Pydantic, Poetry  
+**Frontend**: React, Vite, ESLint
+**Backend**: FastAPI, SQLAlchemy, SQLite, Uvicorn, Pydantic, Poetry
 **Testing**: Pytest (backend), Vitest (frontend), Playwright (E2E)
 
 ## Getting Started
@@ -33,6 +32,7 @@ This monorepo contains:
 ### Installation & Running
 
 1. **Install all dependencies:**
+
    ```bash
    make install
    ```
@@ -43,6 +43,7 @@ This monorepo contains:
    ```
 
 This will start:
+
 - Frontend at <http://localhost:5173>
 - Backend at <http://localhost:8000>
 - API docs at <http://localhost:8000/docs>
@@ -59,16 +60,19 @@ make backend             # Run backend dev server
 ```
 
 For detailed setup instructions, see:
+
 - [Frontend README](frontend/README.md)
 - [Backend README](backend/README.md)
 
 ## Features
 
 **Frontend:**
+
 - Modern React with Vite and HMR
 - API integration ready
 
 **Backend:**
+
 - RESTful API with automatic documentation
 - CRUD operations for Items and Tags
 - Hexagonal Architecture for clean separation
@@ -122,7 +126,6 @@ make check             # Run all checks (lint + pre-commit)
 
 - [Backend README](backend/README.md) - Architecture, API endpoints, and detailed backend documentation
 - [Frontend README](frontend/README.md) - Frontend setup and configuration
-- [Backend Architecture Guide](.github/backend-architecture.instructions.md) - Hexagonal architecture guidelines
 
 ## Contributing
 

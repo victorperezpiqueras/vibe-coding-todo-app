@@ -34,7 +34,8 @@ This backend follows the **Hexagonal Architecture** pattern with three main laye
 - **ORM**: SQLAlchemy models and database mappings
 - **Database**: Repository implementations and database connections
 
-For detailed architecture guidelines, see [.github/backend-architecture.instructions.md](../.github/backend-architecture.instructions.md)
+For detailed architecture guidelines, see [.github/instructions/backend-architecture.instructions.md](/.github/instructions/backend-architecture.instruc.instructions.md)
+For Python coding standards and best practices, see [.github/instructions/python.instructions.md](/.github/instructions/python.instructions.md)
 
 ## Setup
 
@@ -63,6 +64,7 @@ make backend
 ```
 
 The API will be available at:
+
 - API: <http://localhost:8000>
 - Swagger UI: <http://localhost:8000/docs>
 - ReDoc: <http://localhost:8000/redoc>
@@ -114,11 +116,13 @@ pytest -k "test_create"         # Run tests matching pattern
 The project uses `pytest-cov` to track test coverage. Coverage is measured when running the `make test-backend-coverage` command or by using pytest with the `--cov` flag.
 
 Coverage reports generate:
+
 - Terminal output showing coverage percentage and missing lines
 - HTML report in `backend/htmlcov/` directory
 - XML report for CI/CD integration
 
 To view the HTML coverage report after running tests with coverage:
+
 ```bash
 cd backend
 # Run tests to generate coverage report
@@ -161,7 +165,6 @@ tests/
 - **API Tests**: Mock use cases to test HTTP endpoints and status codes
 - **Integration Tests**: Test repository implementations with real database
 - **Total**: 45 tests covering all CRUD operations for Items and Tags
-
 
 ## API Endpoints
 
