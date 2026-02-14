@@ -15,6 +15,7 @@ tests/
 Before running E2E tests, ensure:
 
 1. **Backend is running** on `http://localhost:8000`
+
    ```bash
    cd backend
    uvicorn app.main:app --reload
@@ -29,33 +30,40 @@ Before running E2E tests, ensure:
 ## Running Tests
 
 ### Run E2E tests in CI mode (using Make)
+
 ```bash
 # From the repository root
 make test-e2e-ci
 ```
+
 This command runs E2E tests using Chromium only, which is the configuration used in CI/CD pipelines.
 
 ### Run all E2E tests
+
 ```bash
 npm run test:e2e
 ```
 
 ### Run tests in UI mode (interactive)
+
 ```bash
 npm run test:e2e:ui
 ```
 
 ### Run tests in debug mode
+
 ```bash
 npm run test:e2e:debug
 ```
 
 ### Run specific test file
+
 ```bash
 npx playwright test tests/e2e/basic-task-creation.spec.js
 ```
 
 ### Run tests on specific browser
+
 ```bash
 npx playwright test --project=chromium
 npx playwright test --project=firefox
@@ -63,6 +71,7 @@ npx playwright test --project=webkit
 ```
 
 ### View test report
+
 ```bash
 npm run test:e2e:report
 ```
@@ -128,21 +137,25 @@ The Playwright tests can be integrated into CI/CD pipelines:
 ## Debugging Tests
 
 ### Visual debugging
+
 ```bash
 npm run test:e2e:ui
 ```
 
 ### Step-through debugging
+
 ```bash
 npm run test:e2e:debug
 ```
 
 ### Run headed (see browser)
+
 ```bash
 npx playwright test --headed
 ```
 
 ### Slow down execution
+
 ```bash
 npx playwright test --slow-mo=1000
 ```
@@ -150,21 +163,26 @@ npx playwright test --slow-mo=1000
 ## Common Issues
 
 ### Backend not running
+
 Ensure the backend is running on port 8000 before running tests.
 
 ### Port conflicts
+
 If port 5173 is in use, stop other Vite dev servers or change the port in `playwright.config.js`.
 
 ### Browser installation issues
+
 Run `npx playwright install --with-deps` to install all required browsers and dependencies.
 
 ### Test timeouts
+
 Increase timeout in individual tests if needed:
+
 ```javascript
-test('slow test', async ({ page }) => {
-  test.setTimeout(60000) // 60 seconds
+test("slow test", async ({ page }) => {
+  test.setTimeout(60000); // 60 seconds
   // ... test code
-})
+});
 ```
 
 ## Best Practices

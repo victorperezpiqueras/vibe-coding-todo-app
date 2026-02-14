@@ -1,21 +1,23 @@
 interface FooterProps {
-  backendUrl?: string
+  backendUrl?: string;
 }
 
-export default function Footer({ backendUrl = 'http://localhost:8000/docs' }: FooterProps) {
+export default function Footer({
+  backendUrl = "http://localhost:8000/docs",
+}: FooterProps) {
   return (
     <footer className="mt-auto border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-6 py-4 text-xs text-slate-500">
-        Backend:{' '}
+        Backend:{" "}
         <a
           className="underline hover:text-slate-700"
           href={backendUrl}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {backendUrl.replace('http://', '')}
+          {backendUrl.replace("http://", "")}
         </a>
       </div>
     </footer>
-  )
+  );
 }

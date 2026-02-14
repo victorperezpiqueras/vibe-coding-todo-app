@@ -229,9 +229,9 @@ function App() {
         <button
           data-testid="add-task-button"
           onClick={() => setIsCreateDialogOpen(true)}
-          className="w-full rounded-md border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 hover:border-slate-400 hover:bg-slate-100"
+          className="rounded-md bg-indigo-600 text-white px-4 py-2 text-sm font-medium hover:bg-indigo-500"
         >
-          + Add new task
+          New Task
         </button>
       </section>
 

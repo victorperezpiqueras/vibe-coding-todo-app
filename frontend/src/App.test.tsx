@@ -46,7 +46,7 @@ describe("App Integration", () => {
       render(<App />);
       expect(screen.getByText("Task Board")).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /add new task/i }),
+        screen.getByRole("button", { name: /^new task$/i }),
       ).toBeInTheDocument();
       expect(screen.getByText("To Do")).toBeInTheDocument();
       expect(screen.getByText("In Progress")).toBeInTheDocument();
@@ -110,7 +110,7 @@ describe("App Integration", () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const addButton = screen.getByRole("button", { name: /add new task/i });
+      const addButton = screen.getByRole("button", { name: /^new task$/i });
       await user.click(addButton);
 
       expect(
@@ -126,7 +126,7 @@ describe("App Integration", () => {
       const user = userEvent.setup();
       render(<App />);
 
-      await user.click(screen.getByRole("button", { name: /add new task/i }));
+      await user.click(screen.getByRole("button", { name: /^new task$/i }));
       expect(
         screen.getByPlaceholderText("Enter task name"),
       ).toBeInTheDocument();
@@ -156,7 +156,7 @@ describe("App Integration", () => {
 
       render(<App />);
 
-      await user.click(screen.getByRole("button", { name: /add new task/i }));
+      await user.click(screen.getByRole("button", { name: /^new task$/i }));
 
       const nameInput = screen.getByPlaceholderText("Enter task name");
       await user.type(nameInput, "Test Task");
@@ -182,7 +182,7 @@ describe("App Integration", () => {
       const user = userEvent.setup();
       render(<App />);
 
-      await user.click(screen.getByRole("button", { name: /add new task/i }));
+      await user.click(screen.getByRole("button", { name: /^new task$/i }));
 
       const createButton = screen.getByRole("button", { name: /create task/i });
       await user.click(createButton);

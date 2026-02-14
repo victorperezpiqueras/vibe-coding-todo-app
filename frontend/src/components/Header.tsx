@@ -1,6 +1,6 @@
 interface HeaderProps {
-  apiStatus: string
-  onSync: () => void
+  apiStatus: string;
+  onSync: () => void;
 }
 
 export default function Header({ apiStatus, onSync }: HeaderProps) {
@@ -10,10 +10,12 @@ export default function Header({ apiStatus, onSync }: HeaderProps) {
         <h1 className="text-xl font-semibold text-slate-800">Task Board</h1>
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-500">
-            API:{' '}
+            API:{" "}
             <span
               data-testid="api-status"
-              className={apiStatus === 'healthy' ? 'text-emerald-600' : 'text-rose-600'}
+              className={
+                apiStatus === "healthy" ? "text-emerald-600" : "text-rose-600"
+              }
             >
               {apiStatus}
             </span>
@@ -28,5 +30,5 @@ export default function Header({ apiStatus, onSync }: HeaderProps) {
         </div>
       </div>
     </header>
-  )
+  );
 }
