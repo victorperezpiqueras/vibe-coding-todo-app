@@ -32,7 +32,7 @@ function TagSelector({ availableTags, selectedTagIds, onTagsChange, onCreateTag 
   const selectedTags = availableTags.filter(tag => selectedTagIds.includes(tag.id))
   const unselectedTags = availableTags.filter(tag => !selectedTagIds.includes(tag.id))
 
-  const handleToggleTag = (tagId) => {
+  const handleToggleTag = (tagId: number) => {
     if (selectedTagIds.includes(tagId)) {
       onTagsChange(selectedTagIds.filter(id => id !== tagId))
     } else {
