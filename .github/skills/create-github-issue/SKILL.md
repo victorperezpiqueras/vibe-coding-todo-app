@@ -20,7 +20,7 @@ Markdown template located at:
 
 .github/ISSUE_TEMPLATE/feature_request.md
 
-The skill does NOT redefine the issue structure.  
+The skill does NOT redefine the issue structure.
 It enforces correct usage of the existing template.
 
 ---
