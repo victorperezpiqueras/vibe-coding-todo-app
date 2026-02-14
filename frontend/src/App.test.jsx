@@ -101,36 +101,36 @@ describe('App', () => {
     })
   })
 
-  it('shows "Add new task" button initially', () => {
+  it('shows "Create New Task" button initially', () => {
     render(<App />)
-    expect(screen.getByRole('button', { name: /add new task/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /create new task/i })).toBeInTheDocument()
   })
 
-  it('opens task form when "Add new task" is clicked', async () => {
+  it('opens task dialog when "Create New Task" is clicked', async () => {
     const user = userEvent.setup()
     render(<App />)
 
-    const addButton = screen.getByRole('button', { name: /add new task/i })
+    const addButton = screen.getByRole('button', { name: /create new task/i })
     await user.click(addButton)
 
-    expect(screen.getByPlaceholderText('Task name')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/description/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /create task/i })).toBeInTheDocument()
+    expect(screen.getByTestId('dialog-task-name-input')).toBeInTheDocument()
+    expect(screen.getByTestId('dialog-task-description-input')).toBeInTheDocument()
+    expect(screen.getByTestId('dialog-submit-button')).toBeInTheDocument()
   })
 
-  it('closes task form when Cancel is clicked', async () => {
+  it('closes task dialog when Cancel is clicked', async () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /add new task/i }))
-    expect(screen.getByPlaceholderText('Task name')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /create new task/i }))
+    expect(screen.getByTestId('dialog-task-name-input')).toBeInTheDocument()
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i })
     await user.click(cancelButton)
 
     await waitFor(() => {
-      expect(screen.queryByPlaceholderText('Task name')).not.toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /add new task/i })).toBeInTheDocument()
+      expect(screen.queryByTestId('dialog-task-name-input')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /create new task/i })).toBeInTheDocument()
     })
   })
 
@@ -170,15 +170,15 @@ describe('App', () => {
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /add new task/i }))
+    await user.click(screen.getByRole('button', { name: /create new task/i }))
 
-    const nameInput = screen.getByPlaceholderText('Task name')
+    const nameInput = screen.getByTestId('dialog-task-name-input')
     await user.type(nameInput, 'Test Task')
 
-    const descInput = screen.getByPlaceholderText(/description/i)
+    const descInput = screen.getByTestId('dialog-task-description-input')
     await user.type(descInput, 'Test Description')
 
-    const createButton = screen.getByRole('button', { name: /create task/i })
+    const createButton = screen.getByTestId('dialog-submit-button')
     await user.click(createButton)
 
     await waitFor(() => {
@@ -201,9 +201,9 @@ describe('App', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /add new task/i }))
+    await user.click(screen.getByRole('button', { name: /create new task/i }))
 
-    const createButton = screen.getByRole('button', { name: /create task/i })
+    const createButton = screen.getByTestId('dialog-submit-button')
     await user.click(createButton)
 
     // Should not make POST request

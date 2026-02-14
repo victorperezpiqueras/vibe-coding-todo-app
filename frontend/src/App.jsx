@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import Tag from './components/Tag'
-import TagSelector from './components/TagSelector'
+import ItemDialog from './components/ItemDialog'
 
 const API_URL = 'http://localhost:8000'
 const STORAGE_KEY = 'taskStatusMap'
@@ -13,10 +13,7 @@ const COLUMNS = [
 function App() {
   const [items, setItems] = useState([])
   const [tags, setTags] = useState([])
-  const [newItemName, setNewItemName] = useState('')
-  const [newItemDescription, setNewItemDescription] = useState('')
-  const [selectedTagIds, setSelectedTagIds] = useState([])
-  const [showTaskForm, setShowTaskForm] = useState(false)
+  const [showItemDialog, setShowItemDialog] = useState(false)
   const [apiStatus, setApiStatus] = useState('checking...')
   const [statusMap, setStatusMap] = useState(() => {
     try {
@@ -67,10 +64,7 @@ function App() {
   }, [])
 
   // Create a new item
-  const createItem = async (e) => {
-    e.preventDefault()
-    if (!newItemName.trim()) return
-
+  const createItem = async (itemData) => {
     try {
       const response = await fetch(`${API_URL}/items/`, {
         method: 'POST',
@@ -78,17 +72,14 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: newItemName,
-          description: newItemDescription || 'Created from React frontend',
-          tag_ids: selectedTagIds,
+          name: itemData.name,
+          description: itemData.description || 'Created from React frontend',
+          tag_ids: itemData.tag_ids,
         })
       })
 
       if (response.ok) {
-        setNewItemName('')
-        setNewItemDescription('')
-        setSelectedTagIds([])
-        setShowTaskForm(false)
+        setShowItemDialog(false)
         fetchItems()
       }
     } catch (error) {
@@ -187,64 +178,23 @@ function App() {
 
       {/* Compose */}
       <section className="mx-auto max-w-7xl w-full px-6 py-6">
-        {!showTaskForm ? (
-          <button
-            data-testid="add-task-button"
-            onClick={() => setShowTaskForm(true)}
-            className="w-full rounded-md border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 hover:border-slate-400 hover:bg-slate-100"
-          >
-            + Add new task
-          </button>
-        ) : (
-          <form onSubmit={createItem} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm space-y-3">
-            <div>
-              <input
-                data-testid="task-name-input"
-                type="text"
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                placeholder="Task name"
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                autoFocus
-              />
-            </div>
-            <div>
-              <textarea
-                data-testid="task-description-input"
-                value={newItemDescription}
-                onChange={(e) => setNewItemDescription(e.target.value)}
-                placeholder="Description (optional)"
-                rows={2}
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              />
-            </div>
-            <TagSelector
-              availableTags={tags}
-              selectedTagIds={selectedTagIds}
-              onTagsChange={setSelectedTagIds}
-              onCreateTag={createTag}
-            />
-            <div className="flex gap-2">
-              <button data-testid="create-task-button" type="submit" className="rounded-md bg-indigo-600 text-white px-4 py-2 text-sm font-medium hover:bg-indigo-500">
-                Create Task
-              </button>
-              <button
-                data-testid="cancel-task-button"
-                type="button"
-                onClick={() => {
-                  setShowTaskForm(false)
-                  setNewItemName('')
-                  setNewItemDescription('')
-                  setSelectedTagIds([])
-                }}
-                className="rounded-md bg-slate-200 text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-300"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
+        <button
+          data-testid="add-task-button"
+          onClick={() => setShowItemDialog(true)}
+          className="rounded-md bg-indigo-600 text-white px-4 py-2 text-sm font-medium hover:bg-indigo-500 shadow-sm"
+        >
+          + Create New Task
+        </button>
       </section>
+
+      {/* Item Dialog */}
+      <ItemDialog
+        isOpen={showItemDialog}
+        onClose={() => setShowItemDialog(false)}
+        onSubmit={createItem}
+        availableTags={tags}
+        onCreateTag={createTag}
+      />
 
       {/* Board */}
       <main className="mx-auto max-w-7xl w-full px-6 pb-10">
