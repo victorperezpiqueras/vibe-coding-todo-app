@@ -1,19 +1,18 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TagDTO(BaseModel):
     """DTO for Tag responses"""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     name: str
     color: str = Field(..., pattern="^#[0-9A-Fa-f]{6}$")
     created_at: datetime
     updated_at: datetime | None = None
-
-    class Config:
-        from_attributes = True
 
 
 class TagCreateDTO(BaseModel):

@@ -1,21 +1,22 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class TagInItemDTO(BaseModel):
     """Simplified Tag DTO for inclusion in Item responses"""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     name: str
     color: str
 
-    class Config:
-        from_attributes = True
-
 
 class ItemDTO(BaseModel):
     """DTO for Item responses"""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     name: str
@@ -23,9 +24,6 @@ class ItemDTO(BaseModel):
     created_at: datetime
     updated_at: datetime | None = None
     tags: list[TagInItemDTO] = []
-
-    class Config:
-        from_attributes = True
 
 
 class ItemCreateDTO(BaseModel):
