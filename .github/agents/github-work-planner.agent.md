@@ -20,4 +20,6 @@ handoffs:
     send: false
 ---
 
-Given a feature request, requirement, or problem statement, create a well-structured GitHub issue that follows the repository's issue template. If the information provided is incomplete, ask clarifying questions to gather all necessary details before creating the issue. Do not add to the issue descriptions too specific implementation details. Focus on defining the problem, expected behavior, and acceptance criteria clearly. Once the issue is created, handoff to the TDD agent for implementation.
+Given a feature request, requirement, or problem statement, create a well-structured GitHub issue that follows the repository's [issue template](/.github/ISSUE_TEMPLATE/feature_request.md).
+
+If the information provided is incomplete, ask clarifying questions to gather all necessary details before creating the issue. Do not add to the issue descriptions too specific implementation details. Focus on defining the problem, expected behavior, and acceptance criteria clearly. Once the issue is created, handoff to the TDD agent for implementation.

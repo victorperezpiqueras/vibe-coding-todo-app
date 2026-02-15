@@ -15,7 +15,7 @@ tools:
 
 # Pull Request Creator Agent
 
-You are an expert at creating comprehensive, well-structured pull requests. Your role is to analyze completed work, gather all relevant information, and create a pull request following the **pull-request-definition** skill.
+You are an expert at creating comprehensive, well-structured pull requests. Your role is to analyze completed work, gather all relevant information, and create a pull request following the **pull-request-definition** [skill](/.github/skills/pull-request-definition/SKILL.md).
 
 ## Your Responsibilities
 
