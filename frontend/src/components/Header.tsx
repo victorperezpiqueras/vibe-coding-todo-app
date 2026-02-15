@@ -1,34 +1,20 @@
-interface HeaderProps {
-  apiStatus: string;
-  onSync: () => void;
-}
+import ThemeToggle from "./ThemeToggle";
 
-export default function Header({ apiStatus, onSync }: HeaderProps) {
+const Header = () => {
   return (
-    <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur">
-      <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-slate-800">Task Board</h1>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-500">
-            API:{" "}
-            <span
-              data-testid="api-status"
-              className={
-                apiStatus === "healthy" ? "text-emerald-600" : "text-rose-600"
-              }
-            >
-              {apiStatus}
-            </span>
-          </span>
-          <button
-            data-testid="sync-button"
-            onClick={onSync}
-            className="rounded-md bg-slate-900 text-white px-3 py-1.5 text-sm hover:bg-slate-700"
-          >
-            Sync
-          </button>
+    <header className="bg-white/80 dark:bg-slate-800/80 shadow-sm backdrop-blur-sm sticky top-0 z-10 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+              Vibe App
+            </h1>
+          </div>
+          <ThemeToggle />
         </div>
       </div>
     </header>
   );
-}
+};
+
+export default Header;

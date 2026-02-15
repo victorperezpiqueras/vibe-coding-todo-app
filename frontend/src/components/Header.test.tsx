@@ -1,49 +1,45 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import Header from "./Header";
+import { ThemeProvider } from "../contexts/ThemeContext";
+import userEvent from "@testing-library/user-event";
 
 describe("Header", () => {
-  it("renders the Task Board title", () => {
-    render(<Header apiStatus="healthy" onSync={vi.fn()} />);
-    expect(screen.getByText("Task Board")).toBeInTheDocument();
+  it("renders app title", () => {
+    render(
+      <ThemeProvider>
+        <Header />
+      </ThemeProvider>,
+    );
+    const title = screen.getByText(/vibe app/i);
+    expect(title).toBeInTheDocument();
   });
 
-  it("displays API status as healthy", () => {
-    render(<Header apiStatus="healthy" onSync={vi.fn()} />);
-    const status = screen.getByTestId("api-status");
-    expect(status).toHaveTextContent("healthy");
-    expect(status).toHaveClass("text-emerald-600");
+  it("renders theme toggle button", () => {
+    render(
+      <ThemeProvider>
+        <Header />
+      </ThemeProvider>,
+    );
+    const toggleButton = screen.getByRole("button", { name: /toggle theme/i });
+    expect(toggleButton).toBeInTheDocument();
   });
 
-  it("displays API status as disconnected", () => {
-    render(<Header apiStatus="disconnected" onSync={vi.fn()} />);
-    const status = screen.getByTestId("api-status");
-    expect(status).toHaveTextContent("disconnected");
-    expect(status).toHaveClass("text-rose-600");
-  });
-
-  it("displays API status as checking", () => {
-    render(<Header apiStatus="checking..." onSync={vi.fn()} />);
-    const status = screen.getByTestId("api-status");
-    expect(status).toHaveTextContent("checking...");
-    expect(status).toHaveClass("text-rose-600");
-  });
-
-  it("renders sync button", () => {
-    render(<Header apiStatus="healthy" onSync={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /sync/i })).toBeInTheDocument();
-  });
-
-  it("calls onSync when sync button is clicked", async () => {
+  it("toggles theme when toggle button is clicked", async () => {
     const user = userEvent.setup();
-    const onSync = vi.fn();
+    render(
+      <ThemeProvider>
+        <Header />
+      </ThemeProvider>,
+    );
 
-    render(<Header apiStatus="healthy" onSync={onSync} />);
+    const toggleButton = screen.getByRole("button", { name: /toggle theme/i });
 
-    const syncButton = screen.getByRole("button", { name: /sync/i });
-    await user.click(syncButton);
+    // Initially light mode
+    expect(document.documentElement.classList.contains("dark")).toBe(false);
 
-    expect(onSync).toHaveBeenCalledTimes(1);
+    // Click to toggle to dark
+    await user.click(toggleButton);
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
   });
 });
