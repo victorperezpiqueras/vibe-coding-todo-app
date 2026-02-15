@@ -1,21 +1,22 @@
-# Description of changes
+## Summary
+
+_What does this PR accomplish?_
+
+## Changes
 
 -
-
-# Test suites
-
-- Unit/component tests:
-  -
-- E2E tests (if applicable):
-  -
-- If tests not run, explain why:
-  -
-
-# Playwright screenshots
-
 -
-- If no UI changes, write "N/A".
 
-# Breaking changes
+## Testing
 
-- None
+**Unit/Component:**
+
+**E2E (if applicable):**
+
+## Screenshots
+
+_Attach screenshots for UI changes or write N/A_
+
+## Breaking Changes & Notes
+
+_Anything reviewers should be aware of, or write None_

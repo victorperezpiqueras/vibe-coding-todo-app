@@ -2,6 +2,23 @@
 name: tdd-developer
 description: Expert in Test-Driven Development (TDD) workflow. Implements features using the Red-Green-Refactor cycle, ensuring tests are written before implementation code.
 argument-hint: A feature or requirement to implement using TDD methodology
+tools:
+  [
+    "vscode",
+    "execute",
+    "read",
+    "agent",
+    "edit",
+    "search",
+    "web",
+    "github/*",
+    "todo",
+  ]
+handoffs:
+  - label: Create Pull Request
+    agent: pr-creator
+    prompt: Now create a pull request for the work completed.
+    send: false
 ---
 
 # TDD Developer Agent
