@@ -1,299 +1,177 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import userEvent from "@testing-library/user-event";
 import TagSelector from "./TagSelector";
+import { server, http, HttpResponse } from "../test/setup";
+
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+const renderWithQueryClient = (component: React.ReactElement) => {
+  const queryClient = createTestQueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      {component}
+    </QueryClientProvider>,
+  );
+};
 
 describe("TagSelector", () => {
-  const mockTags = [
-    { id: 1, name: "Bug", color: "#EF4444" },
-    { id: 2, name: "Feature", color: "#22C55E" },
-    { id: 3, name: "Enhancement", color: "#3B82F6" },
-  ];
-
-  const defaultProps = {
-    availableTags: mockTags,
-    selectedTagIds: [],
-    onTagsChange: vi.fn(),
-    onCreateTag: vi.fn(),
-  };
-
   beforeEach(() => {
-    vi.clearAllMocks();
+    server.use(
+      http.get("http://localhost:8000/api/tags/", () => {
+        return HttpResponse.json([
+          { id: 1, name: "tag1", color: "#ff0000" },
+          { id: 2, name: "tag2", color: "#00ff00" },
+          { id: 3, name: "tag3", color: "#0000ff" },
+        ]);
+      }),
+    );
   });
 
-  it("renders with no tags selected message", () => {
-    render(<TagSelector {...defaultProps} />);
-    expect(screen.getByText("No tags selected")).toBeInTheDocument();
+  it("renders the tags label", () => {
+    renderWithQueryClient(
+      <TagSelector selectedTags={[]} onChange={() => {}} />,
+    );
+    expect(screen.getByLabelText(/tags/i)).toBeInTheDocument();
   });
 
-  it("renders selected tags", () => {
-    render(<TagSelector {...defaultProps} selectedTagIds={[1, 2]} />);
-    expect(screen.getByText("Bug")).toBeInTheDocument();
-    expect(screen.getByText("Feature")).toBeInTheDocument();
-    expect(screen.queryByText("No tags selected")).not.toBeInTheDocument();
+  it("shows loading state while fetching tags", () => {
+    renderWithQueryClient(
+      <TagSelector selectedTags={[]} onChange={() => {}} />,
+    );
+    expect(screen.getByText(/loading tags.../i)).toBeInTheDocument();
   });
 
-  it("toggles tag selector dropdown", async () => {
-    const user = userEvent.setup();
-    render(<TagSelector {...defaultProps} />);
-
-    const toggleButton = screen.getByRole("button", { name: /add tags/i });
-    expect(screen.queryByText("All tags selected")).not.toBeInTheDocument();
-
-    await user.click(toggleButton);
-    expect(screen.getByText(/create new tag/i)).toBeInTheDocument();
-
-    await user.click(toggleButton);
-    await waitFor(() => {
-      expect(screen.queryByText(/create new tag/i)).not.toBeInTheDocument();
-    });
-  });
-
-  it("allows selecting an unselected tag", async () => {
-    const user = userEvent.setup();
-    const onTagsChange = vi.fn();
-    render(<TagSelector {...defaultProps} onTagsChange={onTagsChange} />);
-
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-
-    const bugTagButton = screen.getByRole("button", { name: /bug/i });
-    await user.click(bugTagButton);
-
-    expect(onTagsChange).toHaveBeenCalledWith([1]);
-  });
-
-  it("allows removing a selected tag", async () => {
-    const user = userEvent.setup();
-    const onTagsChange = vi.fn();
-    render(
-      <TagSelector
-        {...defaultProps}
-        selectedTagIds={[1]}
-        onTagsChange={onTagsChange}
-      />,
+  it("displays available tags after loading", async () => {
+    renderWithQueryClient(
+      <TagSelector selectedTags={[]} onChange={() => {}} />,
     );
 
-    const removeButton = screen.getByRole("button", {
-      name: /remove bug tag/i,
+    await waitFor(() => {
+      expect(screen.getByText("tag1")).toBeInTheDocument();
+      expect(screen.getByText("tag2")).toBeInTheDocument();
+      expect(screen.getByText("tag3")).toBeInTheDocument();
     });
-    await user.click(removeButton);
-
-    expect(onTagsChange).toHaveBeenCalledWith([]);
   });
 
-  it('shows "All tags selected" when all tags are selected', async () => {
-    const user = userEvent.setup();
-    render(<TagSelector {...defaultProps} selectedTagIds={[1, 2, 3]} />);
+  it("displays error message on fetch failure", async () => {
+    // Suppress console.error for this test
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    expect(screen.getByText("All tags selected")).toBeInTheDocument();
-  });
-
-  it("opens tag creation form", async () => {
-    const user = userEvent.setup();
-    render(<TagSelector {...defaultProps} />);
-
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    await user.click(screen.getByRole("button", { name: /create new tag/i }));
-
-    expect(screen.getByPlaceholderText("Tag name")).toBeInTheDocument();
-    expect(screen.getByText("Color")).toBeInTheDocument();
-  });
-
-  it("creates a new tag", async () => {
-    const user = userEvent.setup();
-    const onCreateTag = vi
-      .fn()
-      .mockResolvedValue({ id: 4, name: "New Tag", color: "#EF4444" });
-    const onTagsChange = vi.fn();
-    render(
-      <TagSelector
-        {...defaultProps}
-        onCreateTag={onCreateTag}
-        onTagsChange={onTagsChange}
-      />,
+    server.use(
+      http.get("http://localhost:8000/api/tags/", () => {
+        return new HttpResponse(null, { status: 500 });
+      }),
     );
 
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    await user.click(screen.getByRole("button", { name: /create new tag/i }));
-
-    const input = screen.getByPlaceholderText("Tag name");
-    await user.type(input, "New Tag");
-
-    const createButton = screen.getByRole("button", { name: /^create$/i });
-    await user.click(createButton);
-
-    await waitFor(() => {
-      expect(onCreateTag).toHaveBeenCalledWith({
-        name: "New Tag",
-        color: "#EF4444", // Default color
-      });
-      // Verify the newly created tag is automatically selected
-      expect(onTagsChange).toHaveBeenCalledWith([4]);
-    });
-  });
-
-  it("selects different color when creating tag", async () => {
-    const user = userEvent.setup();
-    const onCreateTag = vi
-      .fn()
-      .mockResolvedValue({ id: 5, name: "Blue Tag", color: "#3B82F6" });
-    const onTagsChange = vi.fn();
-    render(
-      <TagSelector
-        {...defaultProps}
-        onCreateTag={onCreateTag}
-        onTagsChange={onTagsChange}
-      />,
+    renderWithQueryClient(
+      <TagSelector selectedTags={[]} onChange={() => {}} />,
     );
 
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    await user.click(screen.getByRole("button", { name: /create new tag/i }));
-
-    const input = screen.getByPlaceholderText("Tag name");
-    await user.type(input, "Blue Tag");
-
-    // Select blue color (#3B82F6)
-    const blueColorButton = screen.getByRole("button", {
-      name: /select #3b82f6/i,
-    });
-    await user.click(blueColorButton);
-
-    const createButton = screen.getByRole("button", { name: /^create$/i });
-    await user.click(createButton);
-
     await waitFor(() => {
-      expect(onCreateTag).toHaveBeenCalledWith({
-        name: "Blue Tag",
-        color: "#3B82F6",
-      });
-      // Verify the newly created tag is automatically selected
-      expect(onTagsChange).toHaveBeenCalledWith([5]);
-    });
-  });
-
-  it("cancels tag creation", async () => {
-    const user = userEvent.setup();
-    render(<TagSelector {...defaultProps} />);
-
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    await user.click(screen.getByRole("button", { name: /create new tag/i }));
-
-    const input = screen.getByPlaceholderText("Tag name");
-    await user.type(input, "Cancelled Tag");
-
-    const cancelButton = screen.getByRole("button", { name: /cancel/i });
-    await user.click(cancelButton);
-
-    expect(screen.queryByPlaceholderText("Tag name")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /create new tag/i }),
-    ).toBeInTheDocument();
-  });
-
-  it("does not create tag with empty name", async () => {
-    const user = userEvent.setup();
-    const onCreateTag = vi
-      .fn()
-      .mockResolvedValue({ id: 100, name: "", color: "#000000" });
-    render(<TagSelector {...defaultProps} onCreateTag={onCreateTag} />);
-
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    await user.click(screen.getByRole("button", { name: /create new tag/i }));
-
-    const createButton = screen.getByRole("button", { name: /^create$/i });
-    await user.click(createButton);
-
-    expect(onCreateTag).not.toHaveBeenCalled();
-  });
-
-  it("handles tag creation error", async () => {
-    const user = userEvent.setup();
-    const onCreateTag = vi
-      .fn()
-      .mockRejectedValue(new Error("Tag already exists"));
-    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
-
-    render(<TagSelector {...defaultProps} onCreateTag={onCreateTag} />);
-
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    await user.click(screen.getByRole("button", { name: /create new tag/i }));
-
-    const input = screen.getByPlaceholderText("Tag name");
-    await user.type(input, "Duplicate Tag");
-
-    const createButton = screen.getByRole("button", { name: /^create$/i });
-    await user.click(createButton);
-
-    await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith(
-        "Failed to create tag. Tag name might already exist.",
-      );
+      expect(screen.getByText(/failed to load tags/i)).toBeInTheDocument();
     });
 
-    alertSpy.mockRestore();
+    consoleSpy.mockRestore();
   });
 
-  it("trims whitespace from tag name when creating", async () => {
+  it("allows selecting a tag", async () => {
+    const onChange = vi.fn();
     const user = userEvent.setup();
-    const onCreateTag = vi
-      .fn()
-      .mockResolvedValue({ id: 6, name: "Trimmed Tag", color: "#EF4444" });
-    const onTagsChange = vi.fn();
-    render(
-      <TagSelector
-        {...defaultProps}
-        onCreateTag={onCreateTag}
-        onTagsChange={onTagsChange}
-      />,
+
+    renderWithQueryClient(
+      <TagSelector selectedTags={[]} onChange={onChange} />,
     );
 
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    await user.click(screen.getByRole("button", { name: /create new tag/i }));
-
-    const input = screen.getByPlaceholderText("Tag name");
-    await user.type(input, "  Trimmed Tag  ");
-
-    const createButton = screen.getByRole("button", { name: /^create$/i });
-    await user.click(createButton);
-
     await waitFor(() => {
-      expect(onCreateTag).toHaveBeenCalledWith({
-        name: "Trimmed Tag",
-        color: "#EF4444",
-      });
-      // Verify the newly created tag is automatically selected
-      expect(onTagsChange).toHaveBeenCalledWith([6]);
+      expect(screen.getByText("tag1")).toBeInTheDocument();
     });
+
+    const tag1Button = screen.getByRole("button", { name: /tag1/i });
+    await user.click(tag1Button);
+
+    expect(onChange).toHaveBeenCalledWith([1]);
   });
 
-  it("creates tag when Enter key is pressed", async () => {
+  it("allows deselecting a tag", async () => {
+    const onChange = vi.fn();
     const user = userEvent.setup();
-    const onCreateTag = vi
-      .fn()
-      .mockResolvedValue({ id: 7, name: "Enter Tag", color: "#EF4444" });
-    const onTagsChange = vi.fn();
-    render(
-      <TagSelector
-        {...defaultProps}
-        onCreateTag={onCreateTag}
-        onTagsChange={onTagsChange}
-      />,
+
+    renderWithQueryClient(
+      <TagSelector selectedTags={[1]} onChange={onChange} />,
     );
 
-    await user.click(screen.getByRole("button", { name: /add tags/i }));
-    await user.click(screen.getByRole("button", { name: /create new tag/i }));
+    await waitFor(() => {
+      expect(screen.getByText("tag1")).toBeInTheDocument();
+    });
 
-    const input = screen.getByPlaceholderText("Tag name");
-    await user.type(input, "Enter Tag{Enter}");
+    const tag1Button = screen.getByRole("button", { name: /tag1/i });
+    await user.click(tag1Button);
+
+    expect(onChange).toHaveBeenCalledWith([]);
+  });
+
+  it("allows selecting multiple tags", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+
+    renderWithQueryClient(
+      <TagSelector selectedTags={[]} onChange={onChange} />,
+    );
 
     await waitFor(() => {
-      expect(onCreateTag).toHaveBeenCalledWith({
-        name: "Enter Tag",
-        color: "#EF4444",
-      });
-      // Verify the newly created tag is automatically selected
-      expect(onTagsChange).toHaveBeenCalledWith([7]);
+      expect(screen.getByText("tag1")).toBeInTheDocument();
     });
+
+    const tag1Button = screen.getByRole("button", { name: /tag1/i });
+    const tag2Button = screen.getByRole("button", { name: /tag2/i });
+
+    await user.click(tag1Button);
+    expect(onChange).toHaveBeenCalledWith([1]);
+
+    await user.click(tag2Button);
+    expect(onChange).toHaveBeenCalledWith([1, 2]);
+  });
+
+  it("shows selected tags with different styling", async () => {
+    const user = userEvent.setup();
+
+    renderWithQueryClient(
+      <TagSelector selectedTags={[1]} onChange={() => {}} />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("tag1")).toBeInTheDocument();
+    });
+
+    const tag1Button = screen.getByRole("button", { name: /tag1/i });
+    const tag2Button = screen.getByRole("button", { name: /tag2/i });
+
+    // Selected tag should have different classes
+    expect(tag1Button).toHaveClass("ring-2");
+    expect(tag2Button).not.toHaveClass("ring-2");
+  });
+
+  it("displays tag colors correctly", async () => {
+    renderWithQueryClient(
+      <TagSelector selectedTags={[]} onChange={() => {}} />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("tag1")).toBeInTheDocument();
+    });
+
+    const tag1Button = screen.getByRole("button", { name: /tag1/i });
+
+    // Check that the color is applied via style
+    expect(tag1Button).toHaveStyle({ backgroundColor: "rgb(255, 0, 0)" });
   });
 });

@@ -1,532 +1,250 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { describe, it, expect, vi } from "vitest";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
-import { createMockFetch, setupMockFetch } from "./test/test-utils";
-import { mockItems, mockTags } from "./test/mock-data";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
-// Mock fetch globally
-const mockFetch = vi.fn();
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(globalThis as any).fetch = mockFetch;
-
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value.toString();
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-  };
-})();
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(globalThis as any).localStorage = localStorageMock;
-
-describe("App Integration", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    localStorageMock.clear();
-    setupMockFetch(mockFetch);
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
+const renderApp = () => {
+  const queryClient = createTestQueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </QueryClientProvider>,
+  );
+};
+
+describe("App", () => {
+  it("renders the main application", () => {
+    renderApp();
+    expect(screen.getByText(/vibe app/i)).toBeInTheDocument();
   });
 
-  describe("Initial Render", () => {
-    it("renders the main layout components", () => {
-      render(<App />);
-      expect(screen.getByText("Task Board")).toBeInTheDocument();
+  it("displays API status", async () => {
+    renderApp();
+    expect(screen.getByTestId("api-status")).toBeInTheDocument();
+  });
+
+  it("shows loading state initially", () => {
+    renderApp();
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+  });
+
+  it('shows "Add New Item" button', () => {
+    renderApp();
+    expect(
+      screen.getByRole("button", { name: /add new item/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("opens item creation form when Add New Item is clicked", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
+
+    await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /^new task$/i }),
+        screen.getByRole("heading", { name: /create new item/i }),
       ).toBeInTheDocument();
-      expect(screen.getByText("To Do")).toBeInTheDocument();
-      expect(screen.getByText("In Progress")).toBeInTheDocument();
-      expect(screen.getByText("Done")).toBeInTheDocument();
-    });
-
-    it("displays API status as healthy", async () => {
-      render(<App />);
-      await waitFor(() => {
-        expect(screen.getByText("healthy")).toBeInTheDocument();
-      });
-    });
-
-    it("displays API status as disconnected when health check fails", async () => {
-      setupMockFetch(mockFetch, (url) => {
-        if (url.includes("/health")) {
-          return Promise.reject(new Error("Network error"));
-        }
-      });
-
-      render(<App />);
-      await waitFor(() => {
-        expect(screen.getByText("disconnected")).toBeInTheDocument();
-      });
-    });
-
-    it("fetches items and tags on mount", async () => {
-      render(<App />);
-
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:8000/health");
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:8000/items/");
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:8000/tags/");
-      });
     });
   });
 
-  describe("Sync Functionality", () => {
-    it("syncs data when Sync button is clicked", async () => {
-      const user = userEvent.setup();
-      render(<App />);
+  it("closes item creation form when Cancel is clicked", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
 
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalled();
-      });
-
-      vi.clearAllMocks();
-
-      const syncButton = screen.getByRole("button", { name: /sync/i });
-      await user.click(syncButton);
-
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:8000/items/");
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:8000/tags/");
-      });
-    });
-  });
-
-  describe("Task Creation", () => {
-    it("opens create dialog when add button is clicked", async () => {
-      const user = userEvent.setup();
-      render(<App />);
-
-      const addButton = screen.getByRole("button", { name: /^new task$/i });
-      await user.click(addButton);
-
+    await waitFor(() => {
       expect(
-        screen.getByPlaceholderText("Enter task name"),
-      ).toBeInTheDocument();
-      expect(screen.getByPlaceholderText(/description/i)).toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: /create task/i }),
+        screen.getByRole("heading", { name: /create new item/i }),
       ).toBeInTheDocument();
     });
 
-    it("closes dialog when Cancel is clicked", async () => {
-      const user = userEvent.setup();
-      render(<App />);
+    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    await user.click(cancelButton);
 
-      await user.click(screen.getByRole("button", { name: /^new task$/i }));
+    await waitFor(() => {
       expect(
-        screen.getByPlaceholderText("Enter task name"),
+        screen.queryByRole("heading", { name: /create new item/i }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows name input in item creation form", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows description input in item creation form", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows tag selector in item creation form", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/tags/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows create button in item creation form", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /^create$/i }),
       ).toBeInTheDocument();
-
-      const cancelButton = screen.getByRole("button", { name: /cancel/i });
-      await user.click(cancelButton);
-
-      await waitFor(() => {
-        expect(
-          screen.queryByPlaceholderText("Enter task name"),
-        ).not.toBeInTheDocument();
-      });
-    });
-
-    it("creates a new task successfully", async () => {
-      const user = userEvent.setup();
-      const newItem = mockItems.simple;
-
-      setupMockFetch(mockFetch, (url, options) => {
-        if (url.includes("/items/") && options?.method === "POST") {
-          return Promise.resolve(createMockFetch().post(newItem));
-        }
-        if (url.includes("/items/")) {
-          return Promise.resolve(createMockFetch().items([newItem]));
-        }
-      });
-
-      render(<App />);
-
-      await user.click(screen.getByRole("button", { name: /^new task$/i }));
-
-      const nameInput = screen.getByPlaceholderText("Enter task name");
-      await user.type(nameInput, "Test Task");
-
-      const descInput = screen.getByPlaceholderText(/description/i);
-      await user.type(descInput, "Test Description");
-
-      const createButton = screen.getByRole("button", { name: /create task/i });
-      await user.click(createButton);
-
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          "http://localhost:8000/items/",
-          expect.objectContaining({
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          }),
-        );
-      });
-    });
-
-    it("does not create task with empty name", async () => {
-      const user = userEvent.setup();
-      render(<App />);
-
-      await user.click(screen.getByRole("button", { name: /^new task$/i }));
-
-      const createButton = screen.getByRole("button", { name: /create task/i });
-      await user.click(createButton);
-
-      const postCalls = mockFetch.mock.calls.filter(
-        (call) => call[1]?.method === "POST",
-      );
-      expect(postCalls.length).toBe(0);
     });
   });
 
-  describe("Task Display", () => {
-    it("renders items in To Do column by default", async () => {
-      setupMockFetch(mockFetch, (url) => {
-        if (url.includes("/items/")) {
-          return Promise.resolve(
-            createMockFetch().items([
-              mockItems.simple,
-              mockItems.withDescription,
-            ]),
-          );
-        }
-      });
+  it("shows cancel button in item creation form", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
 
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByText(mockItems.simple.name)).toBeInTheDocument();
-        expect(
-          screen.getByText(mockItems.withDescription.name),
-        ).toBeInTheDocument();
-      });
-    });
-
-    it("renders tasks with tags", async () => {
-      setupMockFetch(mockFetch, (url) => {
-        if (url.includes("/items/")) {
-          return Promise.resolve(createMockFetch().items([mockItems.withTags]));
-        }
-        if (url.includes("/tags/")) {
-          return Promise.resolve(
-            createMockFetch().tags([mockTags.bug, mockTags.feature]),
-          );
-        }
-      });
-
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByText(mockItems.withTags.name)).toBeInTheDocument();
-        expect(screen.getByText(mockTags.bug.name)).toBeInTheDocument();
-        expect(screen.getByText(mockTags.feature.name)).toBeInTheDocument();
-      });
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /cancel/i }),
+      ).toBeInTheDocument();
     });
   });
 
-  describe("Task Deletion", () => {
-    it("deletes a task when delete button is clicked", async () => {
-      const user = userEvent.setup();
-      const itemToDelete = mockItems.simple;
+  it("allows typing in name input", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
 
-      let itemsData = [itemToDelete];
-
-      setupMockFetch(mockFetch, (url, options) => {
-        if (url.includes("/items/1") && options?.method === "DELETE") {
-          itemsData = [];
-          return Promise.resolve(createMockFetch().delete());
-        }
-        if (url.includes("/items/")) {
-          return Promise.resolve(createMockFetch().items(itemsData));
-        }
-      });
-
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByText(itemToDelete.name)).toBeInTheDocument();
-      });
-
-      const taskCard = screen.getByText(itemToDelete.name).closest("article");
-      const deleteButton = taskCard?.querySelector(
-        '[data-testid="delete-task-1"]',
-      );
-      if (!deleteButton) throw new Error("Delete button not found");
-
-      await user.click(deleteButton);
-
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          "http://localhost:8000/items/1",
-          {
-            method: "DELETE",
-          },
-        );
-      });
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     });
+
+    const nameInput = screen.getByLabelText(/name/i);
+    await user.type(nameInput, "Test Item");
+    expect(nameInput).toHaveValue("Test Item");
   });
 
-  describe("Task Editing", () => {
-    it("opens edit dialog when edit button is clicked", async () => {
-      const user = userEvent.setup();
-      const itemToEdit = mockItems.withDescription;
+  it("allows typing in description input", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
 
-      setupMockFetch(mockFetch, (url) => {
-        if (url.includes("/items/")) {
-          return Promise.resolve(createMockFetch().items([itemToEdit]));
-        }
-      });
-
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByText(itemToEdit.name)).toBeInTheDocument();
-      });
-
-      const taskCard = screen.getByText(itemToEdit.name).closest("article");
-      const editButton = taskCard?.querySelector('[data-testid="edit-task-2"]');
-      if (!editButton) throw new Error("Edit button not found");
-
-      await user.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByText("Edit Task")).toBeInTheDocument();
-        expect(screen.getByDisplayValue(itemToEdit.name)).toBeInTheDocument();
-        expect(
-          screen.getByDisplayValue(itemToEdit.description),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByRole("button", { name: /update task/i }),
-        ).toBeInTheDocument();
-      });
+    await waitFor(() => {
+      expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
     });
 
-    it("updates task successfully", async () => {
-      const user = userEvent.setup();
-      const itemToEdit = mockItems.simple;
-      const updatedItem = {
-        ...itemToEdit,
-        name: "Updated Task",
-        description: "Updated Description",
-      };
-
-      let itemsData = [itemToEdit];
-
-      setupMockFetch(mockFetch, (url, options) => {
-        if (url.includes("/items/1") && options?.method === "PUT") {
-          itemsData = [updatedItem];
-          return Promise.resolve(createMockFetch().post(updatedItem));
-        }
-        if (url.includes("/items/")) {
-          return Promise.resolve(createMockFetch().items(itemsData));
-        }
-      });
-
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByText(itemToEdit.name)).toBeInTheDocument();
-      });
-
-      const taskCard = screen.getByText(itemToEdit.name).closest("article");
-      const editButton = taskCard?.querySelector('[data-testid="edit-task-1"]');
-      if (!editButton) throw new Error("Edit button not found");
-
-      await user.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByDisplayValue(itemToEdit.name)).toBeInTheDocument();
-      });
-
-      const nameInput = screen.getByDisplayValue(itemToEdit.name);
-      await user.clear(nameInput);
-      await user.type(nameInput, "Updated Task");
-
-      const descInput = screen.getByPlaceholderText(/description/i);
-      await user.clear(descInput);
-      await user.type(descInput, "Updated Description");
-
-      const updateButton = screen.getByRole("button", { name: /update task/i });
-      await user.click(updateButton);
-
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith(
-          "http://localhost:8000/items/1",
-          expect.objectContaining({
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-          }),
-        );
-      });
-    });
-
-    it("closes edit dialog when cancel is clicked", async () => {
-      const user = userEvent.setup();
-      const itemToEdit = mockItems.simple;
-
-      setupMockFetch(mockFetch, (url) => {
-        if (url.includes("/items/")) {
-          return Promise.resolve(createMockFetch().items([itemToEdit]));
-        }
-      });
-
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByText(itemToEdit.name)).toBeInTheDocument();
-      });
-
-      const taskCard = screen.getByText(itemToEdit.name).closest("article");
-      const editButton = taskCard?.querySelector('[data-testid="edit-task-1"]');
-      if (!editButton) throw new Error("Edit button not found");
-
-      await user.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByText("Edit Task")).toBeInTheDocument();
-      });
-
-      const cancelButton = screen.getByRole("button", { name: /cancel/i });
-      await user.click(cancelButton);
-
-      await waitFor(() => {
-        expect(screen.queryByText("Edit Task")).not.toBeInTheDocument();
-      });
-    });
-
-    it("maintains task column position after editing", async () => {
-      const user = userEvent.setup();
-      const itemToEdit = mockItems.simple;
-      const updatedItem = { ...itemToEdit, name: "Updated Task" };
-
-      let itemsData = [itemToEdit];
-
-      setupMockFetch(mockFetch, (url, options) => {
-        if (url.includes("/items/1") && options?.method === "PUT") {
-          itemsData = [updatedItem];
-          return Promise.resolve(createMockFetch().post(updatedItem));
-        }
-        if (url.includes("/items/")) {
-          return Promise.resolve(createMockFetch().items(itemsData));
-        }
-      });
-
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByText(itemToEdit.name)).toBeInTheDocument();
-      });
-
-      // Item should be in To Do column initially
-      const todoColumn = screen.getByTestId("column-todo");
-      expect(todoColumn).toContainElement(screen.getByText(itemToEdit.name));
-
-      const taskCard = screen.getByText(itemToEdit.name).closest("article");
-      const editButton = taskCard?.querySelector('[data-testid="edit-task-1"]');
-      if (!editButton) throw new Error("Edit button not found");
-
-      await user.click(editButton);
-
-      const nameInput = screen.getByDisplayValue(itemToEdit.name);
-      await user.clear(nameInput);
-      await user.type(nameInput, "Updated Task");
-
-      const updateButton = screen.getByRole("button", { name: /update task/i });
-      await user.click(updateButton);
-
-      await waitFor(() => {
-        expect(screen.queryByText("Edit Task")).not.toBeInTheDocument();
-      });
-    });
+    const descInput = screen.getByLabelText(/description/i);
+    await user.type(descInput, "Test Description");
+    expect(descInput).toHaveValue("Test Description");
   });
 
-  describe("LocalStorage Persistence", () => {
-    it("persists task status to localStorage", async () => {
-      const user = userEvent.setup();
+  it("disables create button when name is empty", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
 
-      setupMockFetch(mockFetch, (url, options) => {
-        if (url.includes("/items/1") && options?.method === "DELETE") {
-          return Promise.resolve(createMockFetch().delete());
-        }
-        if (url.includes("/items/")) {
-          return Promise.resolve(createMockFetch().items([mockItems.simple]));
-        }
-      });
-
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByText(mockItems.simple.name)).toBeInTheDocument();
-      });
-
-      const taskCard = screen
-        .getByText(mockItems.simple.name)
-        .closest("article");
-      const deleteButton = taskCard?.querySelector(
-        '[data-testid="delete-task-1"]',
-      );
-      if (!deleteButton) throw new Error("Delete button not found");
-
-      await user.click(deleteButton);
-
-      await waitFor(() => {
-        expect(localStorageMock.setItem).toHaveBeenCalledWith(
-          "taskStatusMap",
-          expect.any(String),
-        );
-      });
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /^create$/i }),
+      ).toBeInTheDocument();
     });
 
-    it("loads task status from localStorage on mount", () => {
-      const savedStatus = { "1": "done", "2": "inprogress" };
-      localStorageMock.getItem.mockReturnValue(JSON.stringify(savedStatus));
-
-      setupMockFetch(mockFetch, (url) => {
-        if (url.includes("/items/")) {
-          return Promise.resolve(
-            createMockFetch().items([
-              { ...mockItems.simple, id: 1 },
-              { ...mockItems.withDescription, id: 2 },
-            ]),
-          );
-        }
-      });
-
-      render(<App />);
-
-      expect(localStorageMock.getItem).toHaveBeenCalledWith("taskStatusMap");
-    });
-
-    it("handles localStorage errors gracefully", () => {
-      localStorageMock.getItem.mockImplementation(() => {
-        throw new Error("LocalStorage error");
-      });
-
-      expect(() => render(<App />)).not.toThrow();
-    });
+    const createButton = screen.getByRole("button", { name: /^create$/i });
+    expect(createButton).toBeDisabled();
   });
 
-  describe("Footer", () => {
-    it("renders footer with backend API link", () => {
-      render(<App />);
-      const link = screen.getByRole("link", { name: /localhost:8000\/docs/i });
-      expect(link).toHaveAttribute("href", "http://localhost:8000/docs");
-      expect(link).toHaveAttribute("target", "_blank");
+  it("enables create button when name is provided", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     });
+
+    const nameInput = screen.getByLabelText(/name/i);
+    await user.type(nameInput, "Test Item");
+
+    const createButton = screen.getByRole("button", { name: /^create$/i });
+    expect(createButton).toBeEnabled();
+  });
+
+  it("resets form when closed and reopened", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    // Open form and fill it
+    const addButton = screen.getByRole("button", { name: /add new item/i });
+    await user.click(addButton);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    });
+
+    const nameInput = screen.getByLabelText(/name/i);
+    await user.type(nameInput, "Test Item");
+
+    // Close form
+    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    await user.click(cancelButton);
+
+    // Reopen form
+    await user.click(addButton);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    });
+
+    // Check that input is empty
+    const nameInputAfterReopen = screen.getByLabelText(/name/i);
+    expect(nameInputAfterReopen).toHaveValue("");
+  });
+
+  it("shows API connection status", () => {
+    renderApp();
+    const statusElement = screen.getByTestId("api-status");
+    expect(statusElement).toBeInTheDocument();
+  });
+
+  it("renders items container", () => {
+    renderApp();
+    const container = screen.getByTestId("items-container");
+    expect(container).toBeInTheDocument();
   });
 });
