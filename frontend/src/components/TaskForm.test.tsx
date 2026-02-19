@@ -40,6 +40,7 @@ describe("TaskForm", () => {
         name: "Test Task",
         description: "",
         tag_ids: [],
+        due_date: undefined,
       });
     });
   });
@@ -64,6 +65,7 @@ describe("TaskForm", () => {
         name: "Test Task",
         description: "Test Description",
         tag_ids: [],
+        due_date: undefined,
       });
     });
   });
@@ -161,5 +163,57 @@ describe("TaskForm", () => {
     expect(
       screen.getByRole("button", { name: /create task/i }),
     ).toBeInTheDocument();
+  });
+
+  it("renders due date input", () => {
+    render(<TaskForm {...defaultProps} />);
+    expect(screen.getByTestId("task-due-date-input")).toBeInTheDocument();
+  });
+
+  it("submits form with due date when provided", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+
+    render(<TaskForm {...defaultProps} onSubmit={onSubmit} />);
+
+    const nameInput = screen.getByTestId("task-name-input");
+    await user.type(nameInput, "Task With Due Date");
+
+    const dueDateInput = screen.getByTestId("task-due-date-input");
+    await user.type(dueDateInput, "2099-12-31T12:00");
+
+    const submitButton = screen.getByRole("button", { name: /create task/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: "Task With Due Date",
+          due_date: expect.any(String),
+        }),
+      );
+    });
+  });
+
+  it("clears due date after successful submit", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+
+    render(<TaskForm {...defaultProps} onSubmit={onSubmit} />);
+
+    const nameInput = screen.getByTestId("task-name-input") as HTMLInputElement;
+    const dueDateInput = screen.getByTestId(
+      "task-due-date-input",
+    ) as HTMLInputElement;
+
+    await user.type(nameInput, "Task");
+    await user.type(dueDateInput, "2099-12-31T12:00");
+
+    const submitButton = screen.getByRole("button", { name: /create task/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(dueDateInput.value).toBe("");
+    });
   });
 });

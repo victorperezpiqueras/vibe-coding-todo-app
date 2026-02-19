@@ -122,4 +122,34 @@ describe("TaskCard", () => {
     expect(taskCard).toHaveClass("rounded-lg");
     expect(taskCard).toHaveClass("cursor-grab");
   });
+
+  it("shows red due date indicator when overdue", () => {
+    render(<TaskCard {...defaultProps} item={mockItems.overdue} />);
+    const indicator = screen.getByTestId(`due-date-${mockItems.overdue.id}`);
+    expect(indicator).toBeInTheDocument();
+    expect(indicator).toHaveClass("text-red-600");
+  });
+
+  it("shows orange due date indicator when within 24 hours", () => {
+    render(<TaskCard {...defaultProps} item={mockItems.urgentWithin24h} />);
+    const indicator = screen.getByTestId(
+      `due-date-${mockItems.urgentWithin24h.id}`,
+    );
+    expect(indicator).toBeInTheDocument();
+    expect(indicator).toHaveClass("text-orange-500");
+  });
+
+  it("does not show due date indicator when due date is more than 24 hours away", () => {
+    render(<TaskCard {...defaultProps} item={mockItems.notUrgent} />);
+    expect(
+      screen.queryByTestId(`due-date-${mockItems.notUrgent.id}`),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not show due date indicator when no due date", () => {
+    render(<TaskCard {...defaultProps} item={mockItems.simple} />);
+    expect(
+      screen.queryByTestId(`due-date-${mockItems.simple.id}`),
+    ).not.toBeInTheDocument();
+  });
 });

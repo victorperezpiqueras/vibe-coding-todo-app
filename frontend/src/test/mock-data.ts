@@ -26,6 +26,27 @@ export const mockItems = {
     tags: [mockTags.bug, mockTags.feature],
   },
   minimal: { id: 4, name: "Minimal", description: "", tags: [] },
+  overdue: {
+    id: 5,
+    name: "Overdue Task",
+    description: "This task is overdue",
+    tags: [],
+    due_date: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+  },
+  urgentWithin24h: {
+    id: 6,
+    name: "Urgent Task",
+    description: "Due within 24 hours",
+    tags: [],
+    due_date: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+  },
+  notUrgent: {
+    id: 7,
+    name: "Future Task",
+    description: "Due in the future",
+    tags: [],
+    due_date: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+  },
 };
 
 export function createMockItem(overrides?: Partial<Item>): Item {

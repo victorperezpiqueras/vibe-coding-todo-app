@@ -23,6 +23,7 @@ class ItemDTO(BaseModel):
     description: str | None = None
     created_at: datetime
     updated_at: datetime | None = None
+    due_date: datetime | None = None
     tags: list[TagInItemDTO] = []
 
 
@@ -32,6 +33,7 @@ class ItemCreateDTO(BaseModel):
     name: str
     description: str | None = None
     tag_ids: list[int] = []
+    due_date: datetime | None = None
 
 
 class ItemUpdateDTO(BaseModel):
@@ -40,3 +42,4 @@ class ItemUpdateDTO(BaseModel):
     name: str | None = None
     description: str | None = None
     tag_ids: list[int] | None = None
+    due_date: datetime | None = None
