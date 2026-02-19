@@ -1,5 +1,7 @@
 """Integration tests for ItemRepositoryImpl"""
 
+from datetime import UTC, datetime
+
 import pytest
 from sqlalchemy.orm import Session
 
@@ -170,6 +172,7 @@ class TestItemRepositoryImplCreate:
         assert result.description == "New Description"
         assert result.created_at is not None
         assert result.tags == []
+        assert result.due_date is None
 
         # Verify item exists in database
         db_item = db_session.query(ItemORM).filter(ItemORM.id == result.id).first()
@@ -431,3 +434,63 @@ class TestItemRepositoryImplDelete:
         # Verify tag still exists (should not be deleted)
         db_tag = db_session.query(TagORM).filter(TagORM.id == tag_id).first()
         assert db_tag is not None
+
+
+class TestItemRepositoryImplDueDate:
+    """Test due_date handling in repository"""
+
+    @pytest.mark.asyncio
+    async def test_create_item_with_due_date(self, db_session: Session):
+        """Test creating an item with a due date"""
+        # Arrange
+        repository = ItemRepositoryImpl(db_session)
+        due_date = datetime(2024, 6, 15, 12, 0, 0, tzinfo=UTC)
+        item = Item(name="Item with Due Date", due_date=due_date)
+
+        # Act
+        result = await repository.create(item)
+
+        # Assert
+        assert result is not None
+        assert result.due_date is not None
+        # Compare as naive datetimes since SQLite strips timezone info
+        assert result.due_date.replace(tzinfo=None) == due_date.replace(tzinfo=None)
+
+        # Verify in database
+        db_item = db_session.query(ItemORM).filter(ItemORM.id == result.id).first()
+        assert db_item.due_date is not None
+
+    @pytest.mark.asyncio
+    async def test_create_item_without_due_date(self, db_session: Session):
+        """Test creating an item without a due date defaults to None"""
+        # Arrange
+        repository = ItemRepositoryImpl(db_session)
+        item = Item(name="Item Without Due Date")
+
+        # Act
+        result = await repository.create(item)
+
+        # Assert
+        assert result is not None
+        assert result.due_date is None
+
+    @pytest.mark.asyncio
+    async def test_update_item_due_date(self, db_session: Session):
+        """Test updating the due date of an existing item"""
+        # Arrange: Create an item without a due date
+        existing_item = ItemORM(name="Item", description="Description")
+        db_session.add(existing_item)
+        db_session.commit()
+        item_id = existing_item.id
+
+        due_date = datetime(2024, 6, 15, 12, 0, 0, tzinfo=UTC)
+        repository = ItemRepositoryImpl(db_session)
+        updated_item = Item(name="Item", description="Description", due_date=due_date)
+
+        # Act
+        result = await repository.update(item_id, updated_item)
+
+        # Assert
+        assert result is not None
+        assert result.due_date is not None
+        assert result.due_date.replace(tzinfo=None) == due_date.replace(tzinfo=None)

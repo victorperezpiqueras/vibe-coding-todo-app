@@ -8,12 +8,33 @@ interface TaskCardProps {
   onDragStart: (e: React.DragEvent<HTMLElement>, item: Item) => void;
 }
 
+function getDueDateIndicator(
+  dueDate: string | undefined,
+): { label: string; className: string } | null {
+  if (!dueDate) return null;
+  const now = new Date();
+  const due = new Date(dueDate);
+  const diffMs = due.getTime() - now.getTime();
+  if (diffMs < 0) {
+    return { label: `Due: ${due.toLocaleString()}`, className: "text-red-600" };
+  }
+  if (diffMs <= 24 * 60 * 60 * 1000) {
+    return {
+      label: `Due: ${due.toLocaleString()}`,
+      className: "text-orange-500",
+    };
+  }
+  return null;
+}
+
 export default function TaskCard({
   item,
   onDelete,
   onEdit,
   onDragStart,
 }: TaskCardProps) {
+  const dueDateIndicator = getDueDateIndicator(item.due_date);
+
   return (
     <article
       data-testid={`task-${item.id}`}
@@ -26,6 +47,14 @@ export default function TaskCard({
           <h3 className="text-sm font-medium text-slate-800">{item.name}</h3>
           {item.description && (
             <p className="mt-1 text-xs text-slate-500">{item.description}</p>
+          )}
+          {dueDateIndicator && (
+            <p
+              data-testid={`due-date-${item.id}`}
+              className={`mt-1 text-xs font-medium ${dueDateIndicator.className}`}
+            >
+              {dueDateIndicator.label}
+            </p>
           )}
           {item.tags && item.tags.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
